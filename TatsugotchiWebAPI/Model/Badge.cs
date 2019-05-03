@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TatsugotchiWebAPI.Model.EFClasses;
 
 namespace TatsugotchiWebAPI.Model {
     public class Badge {
@@ -11,6 +13,7 @@ namespace TatsugotchiWebAPI.Model {
         #endregion
 
         #region Properties
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         [Required]
@@ -28,7 +31,7 @@ namespace TatsugotchiWebAPI.Model {
         [Required]
         [Range(0.0, 1.0)]
         public double Chance { get; protected set; }
-        
+
         //An initial badge can be radomly given on Animal Generation
         [Required]
         public bool IsInit { get; protected set; }
@@ -37,8 +40,6 @@ namespace TatsugotchiWebAPI.Model {
         #region Association
         [Required]
         public BadgeType Type { get; protected set; }
-        [Required]
-        public ICollection<Animal> Animals { get; private set; }
         #endregion
 
         #region Calculated Attributes
@@ -57,11 +58,12 @@ namespace TatsugotchiWebAPI.Model {
         //Entity Framework constructor
         protected Badge() {}
         public Badge(int value, string description, string name,
-            double chance, bool isInit = false) {
+            double chance, BadgeType type, bool isInit = false) {
                 Value = value;
                 Description = description;
                 Name = name;
                 Chance = chance;
+                Type = type;
                 IsInit = isInit;
             }
         #endregion

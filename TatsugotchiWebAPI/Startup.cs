@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TatsugotchiWebAPI.Data;
+using TatsugotchiWebAPI.Data.Repository;
+using TatsugotchiWebAPI.Model.Interfaces;
 
 namespace TatsugotchiWebAPI {
     public class Startup {
@@ -31,15 +33,19 @@ namespace TatsugotchiWebAPI {
                   )
              );
 
-            //scope the repositories
+            //scope data initializer
+            services.AddScoped<DataInitializer>();
 
+            //scope the repositories
+            services.AddScoped<IAnimalRepository, AnimalRepository>();
+            services.AddScoped<IBadgeRepository, BadgeRepository>();
 
             services.AddOpenApiDocument();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,DataInitializer di) {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
@@ -52,6 +58,8 @@ namespace TatsugotchiWebAPI {
 
             app.UseSwaggerUi3();
             app.UseSwagger();
+
+            di.Seed();
         }
     }
 }
