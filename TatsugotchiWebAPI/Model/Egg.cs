@@ -5,7 +5,10 @@ using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Model {
     public class Egg {
+        public int MotherID { get; set; }
+        public int FatherID { get; set; }
 
+        
         public int ID { get; set; }
         public Animal Mother { get; set; }
         public Animal Father { get; set; }
@@ -28,6 +31,9 @@ namespace TatsugotchiWebAPI.Model {
             DateConceived = DateTime.Now;
             Type = Mother.Type;
         }
+
+        //EF Constructor
+        protected Egg() {}
 
     }
 }

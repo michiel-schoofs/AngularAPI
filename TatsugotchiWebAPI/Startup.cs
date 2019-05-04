@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Timers;
 using TatsugotchiWebAPI.Data;
 using TatsugotchiWebAPI.Data.Repository;
 using TatsugotchiWebAPI.Model.Interfaces;
@@ -22,6 +23,7 @@ namespace TatsugotchiWebAPI {
         }
 
         public IConfiguration Configuration { get; }
+        private int _timerTime;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
@@ -42,6 +44,8 @@ namespace TatsugotchiWebAPI {
 
             services.AddOpenApiDocument();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            _timerTime = Configuration.GetValue<int>("TimerEventPeriod");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +64,21 @@ namespace TatsugotchiWebAPI {
             app.UseSwagger();
 
             di.Seed();
+            MakeTimerThread();
+        }
+
+        //Initializes timer, creates diffrent thread
+        public void MakeTimerThread() {
+            Timer timer = new Timer(_timerTime) {
+                AutoReset = true,
+                Enabled = true
+            };
+
+            timer.Elapsed += OnTimedEvent;
+        }
+
+        public void OnTimedEvent(Object source,ElapsedEventArgs a) {
+             System.Diagnostics.Debug.WriteLine("Event raised");
         }
     }
 }

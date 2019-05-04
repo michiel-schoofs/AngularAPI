@@ -48,7 +48,9 @@ namespace TatsugotchiWebAPI.Model {
         #region Associations
             public AnimalType Type { get; set; }
             public AnimalGender Gender { get; set; }
+
             public Egg Egg { get; set; }
+            public int EggId { get; set; }
 
             public List<AnimalBadges> AnimalBadges { get; set; }
             [NotMapped]

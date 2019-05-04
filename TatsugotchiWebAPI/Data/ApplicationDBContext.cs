@@ -25,7 +25,8 @@ namespace TatsugotchiWebAPI.Data {
             modelBuilder.ApplyConfiguration<Animal>(new AnimalMapper())
                 .ApplyConfiguration<ChildParentAnimal>(new ChildParenAnimalMapper())
                 .ApplyConfiguration<AnimalBadges>(new AnimalBadgesMapper())
-                .ApplyConfiguration<Badge>(new BadgesMapper());
+                .ApplyConfiguration<Badge>(new BadgesMapper())
+                .ApplyConfiguration<Egg>(new EggMapper());
 
             SeedData(modelBuilder);
         }
