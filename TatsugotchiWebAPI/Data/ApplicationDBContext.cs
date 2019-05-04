@@ -62,7 +62,13 @@ namespace TatsugotchiWebAPI.Data {
                 new Badge("Naughty little fellow","Sexual deviant",0.05,BadgeType.positive){ ID=22},
                 new Badge("It's not a phase mom","Emo",0.25,BadgeType.positive,true){ID=23},
                 new Badge("Being the drivingforce behind progress","Worker",0.4,BadgeType.positive) { ID=24},
-                new Badge("Today I don't feel like doing anything","Lazy",0.87,BadgeType.positive){ ID=25}
+                new Badge("Today I don't feel like doing anything","Lazy",0.87,BadgeType.positive){ ID=25},
+                new Badge("I wasn't cut out for this world","Doomer",0.5,BadgeType.negative,true){ ID=26},
+                new Badge("HONK HONK","Honker",0.4,BadgeType.neutral,true){ ID=27},
+                new Badge("The world is meaningless that's why I made my own","Bloomer",0.25,BadgeType.positive,true){ ID=28},
+                new Badge("Wake me up before you go-go","Boomer",0.3,BadgeType.cool,true){ ID=29},
+                new Badge("Slays the ladies, eats the pussies","Chad",0.02,BadgeType.positive,true){ ID=30},
+                new Badge("I swear it's just my bone structure","Incel",0.04,BadgeType.negative,true){ ID=31}
             };
 
             modelBuilder.Entity<Badge>().HasData(badges);

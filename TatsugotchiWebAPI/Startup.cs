@@ -15,6 +15,7 @@ using System.Timers;
 using TatsugotchiWebAPI.Data;
 using TatsugotchiWebAPI.Data.Repository;
 using TatsugotchiWebAPI.Model.Interfaces;
+using TatsugotchiWebAPI.BackgroundWorkers;
 
 namespace TatsugotchiWebAPI {
     public class Startup {
@@ -24,8 +25,10 @@ namespace TatsugotchiWebAPI {
 
         public IConfiguration Configuration { get; }
         private int _timerTime;
+        private Timer _animalTimer;
+        public ServiceProvider Services { get; private set; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+    // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
 
             //Add db Context and use the connection string found in appsettings.json
@@ -46,10 +49,11 @@ namespace TatsugotchiWebAPI {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             _timerTime = Configuration.GetValue<int>("TimerEventPeriod");
+            Services = services.BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env,DataInitializer di) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,DataInitializer di,ApplicationDBContext context) {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
@@ -69,16 +73,31 @@ namespace TatsugotchiWebAPI {
 
         //Initializes timer, creates diffrent thread
         public void MakeTimerThread() {
-            Timer timer = new Timer(_timerTime) {
-                AutoReset = true,
+            _animalTimer = new Timer(_timerTime) {
+                AutoReset = false,
                 Enabled = true
             };
 
-            timer.Elapsed += OnTimedEvent;
+            //Creates worker and make it subscribe
+            AnimalWorker aw = new AnimalWorker(Services);
+            aw.InitWorker();
+            aw.AnimalWorkerComplete += OnWorkerCompleted;
+
+            _animalTimer.Elapsed += (source,args) => OnTimedEvent(source,args,aw);
         }
 
-        public void OnTimedEvent(Object source,ElapsedEventArgs a) {
-             System.Diagnostics.Debug.WriteLine("Event raised");
+        //Delegate the worker to do stuff
+        public void OnTimedEvent(Object source,ElapsedEventArgs a,AnimalWorker aw) {
+            System.Diagnostics.Debug.WriteLine("Timed event raised");
+            aw.RunWorker();
+            _animalTimer.Stop();
         }
+
+        //Restart timer if worker completed
+        public void OnWorkerCompleted(object source, EventArgs e) {
+            System.Diagnostics.Debug.WriteLine("Timer starting");
+            _animalTimer.Start();
+        }
+
     }
 }
