@@ -17,10 +17,6 @@ namespace TatsugotchiWebAPI.Model {
         public int ID { get; set; }
 
         [Required]
-        [Range(1, 100)]
-        public int Value { get; protected set; }
-
-        [Required]
         [StringLength(200, MinimumLength = 4)]
         public string Description { get; protected set; }
 
@@ -52,14 +48,16 @@ namespace TatsugotchiWebAPI.Model {
                     return $"{_imagePath}\\{ico}.png";
                 }
             }
+
+            [NotMapped]
+            public int Value { get => 100 - (int)(Chance * 10); }
         #endregion
 
         #region Constructors
         //Entity Framework constructor
         protected Badge() {}
-        public Badge(int value, string description, string name,
+        public Badge(string description, string name,
             double chance, BadgeType type, bool isInit = false) {
-                Value = value;
                 Description = description;
                 Name = name;
                 Chance = chance;
