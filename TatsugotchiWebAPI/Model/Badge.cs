@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TatsugotchiWebAPI.Model.EFClasses;
+using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Model {
     public class Badge {

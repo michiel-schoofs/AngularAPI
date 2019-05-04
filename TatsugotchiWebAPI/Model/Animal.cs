@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using TatsugotchiWebAPI.Model.EFClasses;
+using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Model {
     public class Animal {
@@ -40,10 +41,15 @@ namespace TatsugotchiWebAPI.Model {
             public int Boredom { get; protected set; }
 
             [DataType(DataType.DateTime)]
-            public DateTime BirthDate { get; protected set; }
+            public DateTime BirthDate { get; set; }
+
         #endregion
 
         #region Associations
+            public AnimalType Type { get; set; }
+            public AnimalGender Gender { get; set; }
+            public Egg Egg { get; set; }
+
             public List<AnimalBadges> AnimalBadges { get; set; }
             [NotMapped]
             public List<Badge> Badges { get => AnimalBadges.Select(ab => ab.Badge).ToList(); }
@@ -56,30 +62,74 @@ namespace TatsugotchiWebAPI.Model {
         #endregion
 
         #region Calculated Attributes
-        [NotMapped]
+            [NotMapped]
             public string Image { get; protected set; }
+            [NotMapped]
+             public int Age { get => (DateTime.Now.Subtract(BirthDate).Days) / 5; }
+            [NotMapped]
+            public bool IsExpecting { get => Egg != null; }
+            [NotMapped]
+            public bool IsRightAge { get{
+                    var boolean = false;
+
+                    switch (this.Type) {
+                        case AnimalType.Alpaca:
+                            boolean = Age >= 3;
+                            break;
+                        default:
+                            boolean = Age >= 2;
+                            break;
+                    }
+
+                    return boolean;
+                }
+            }
+
+            [NotMapped]
+            public bool CanBreed { get => (!IsExpecting) && IsRightAge; }
         #endregion
 
         #region Constructors
-        public Animal(string name, List<Badge> InitialBadges = null,List < Animal> parents=null) {
-            Name = name;
-            this.parents = parents;
-            
-            //Attributes
-            AttributeInheritance();
-
-            //Badges
-            AnimalBadges = new List<AnimalBadges>();
-            //if no parents go for InitialBadges
+        //First gen constructor
+        public Animal(string name, List<Badge> InitialBadges) {
+            SharedAttributes(name);
             BadgeInheritance(InitialBadges);
 
-            BirthDate = DateTime.Now;
-            Boredom = 0;
+            var r = rand.Next(0, 101);
+            if (r <= 60)
+                this.Type = AnimalType.Capybara;
+            else {
+                if (r > 60 && r < 85)
+                    this.Type = AnimalType.Tapir;
+                else
+                    this.Type = AnimalType.Alpaca;
+            }
+        }
+
+        //Has parents constructor
+        protected Animal(string name, AnimalType type,List<Animal> parents) {
+            this.parents = parents;
+            this.Type = type;
+
+            SharedAttributes(name);
+            BadgeInheritance();
 
             MakeBetweenTableForSelfManyToMany();
         }
 
+        private void SharedAttributes(string name) {
+            Name = name;
 
+            //Random Gender
+            int r = rand.Next(0, 2);
+            Gender = (r == 0 ? AnimalGender.Female : AnimalGender.Male);
+            AnimalBadges = new List<AnimalBadges>();
+
+            AttributeInheritance();
+
+            BirthDate = DateTime.Now;
+            Boredom = 0;
+        }
 
         //EF Constructor
         protected Animal() {}
@@ -133,6 +183,23 @@ namespace TatsugotchiWebAPI.Model {
                 throw new ArgumentException("An animal can only have two or no parents (First generation)");
 
             Tussen = parents.Select(p => new ChildParentAnimal(p, this)).ToList();
+        }
+
+        //Make breed method
+        private void Breed(Animal partner) {
+            if (partner.Gender == Gender)
+                throw new ArgumentException("You need to have two different genders");
+
+            if (partner.Type != Type)
+                throw new ArgumentException("You can only breed two animals of the same type");
+
+            if (!CanBreed)
+                throw new ArgumentException("This animal can't breed");
+
+            var female = (partner.Gender == AnimalGender.Female ? partner : this);
+            var male = (female.Equals(partner) ? this : partner);
+
+            female.Egg = new Egg(female, male);
         }
         #endregion
     }

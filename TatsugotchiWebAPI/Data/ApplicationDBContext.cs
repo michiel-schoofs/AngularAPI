@@ -3,6 +3,7 @@ using TatsugotchiWebAPI.Data.Mapping;
 using TatsugotchiWebAPI.Model;
 using System.Linq;
 using TatsugotchiWebAPI.Model.EFClasses;
+using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Data {
     public class ApplicationDBContext : DbContext {

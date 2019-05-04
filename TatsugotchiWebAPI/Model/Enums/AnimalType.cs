@@ -1,4 +1,4 @@
-﻿namespace TatsugotchiWebAPI.Model {
+﻿namespace TatsugotchiWebAPI.Model.Enums {
     public enum AnimalType {
         Tapir,
         Capybara,
