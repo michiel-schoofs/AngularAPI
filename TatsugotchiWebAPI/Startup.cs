@@ -73,17 +73,14 @@ namespace TatsugotchiWebAPI {
 
         //Initializes timer, creates diffrent thread
         public void MakeTimerThread() {
-            _animalTimer = new Timer(_timerTime) {
-                AutoReset = false,
-                Enabled = true
-            };
-
+            _animalTimer = new Timer(_timerTime);
             //Creates worker and make it subscribe
             AnimalWorker aw = new AnimalWorker(Services);
             aw.InitWorker();
             aw.AnimalWorkerComplete += OnWorkerCompleted;
 
             _animalTimer.Elapsed += (source,args) => OnTimedEvent(source,args,aw);
+            _animalTimer.Start();
         }
 
         //Delegate the worker to do stuff

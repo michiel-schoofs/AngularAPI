@@ -12,14 +12,14 @@ namespace TatsugotchiWebAPI.Data.Mapping {
                 builder.HasOne(ab => ab.Animal)
                     .WithMany(ab => ab.AnimalBadges)
                     .HasForeignKey(ab => ab.AnimalID)
-                    .IsRequired()
+                    .HasPrincipalKey(a=>a.ID)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                builder.HasOne(ab => ab.Badge)
-                    .WithMany()
-                    .HasForeignKey(ab => ab.BadgeID)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade); 
+            builder.HasOne(ab => ab.Badge)
+                .WithMany()
+                .HasForeignKey(ab => ab.BadgeID)
+                .HasPrincipalKey(b => b.ID)
+                .OnDelete(DeleteBehavior.Cascade); 
             #endregion
         }
     }

@@ -22,13 +22,17 @@ namespace TatsugotchiWebAPI.BackgroundWorkers {
         public void InitWorker() {
             bw.DoWork += (sender, args) => {
                 System.Diagnostics.Debug.WriteLine("Worker starting action");
-                Thread.Sleep(6000);
+                PreformDatabaseActions();
             };
             bw.RunWorkerCompleted += (sender, args) => { OnAnimalWorkerCompleted(args); };
         }
 
         public void RunWorker() {
             bw.RunWorkerAsync();
+        }
+
+        private void PreformDatabaseActions() {
+
         }
 
         protected virtual void OnAnimalWorkerCompleted(EventArgs args) {

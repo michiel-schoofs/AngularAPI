@@ -49,8 +49,7 @@ namespace TatsugotchiWebAPI.Model {
             public AnimalType Type { get; set; }
             public AnimalGender Gender { get; set; }
 
-            public Egg Egg { get; set; }
-            public int EggId { get; set; }
+            public bool Pregnant { get; set; }
 
             public List<AnimalBadges> AnimalBadges { get; set; }
             [NotMapped]
@@ -69,8 +68,6 @@ namespace TatsugotchiWebAPI.Model {
             [NotMapped]
              public int Age { get => (DateTime.Now.Subtract(BirthDate).Days) / 5; }
             [NotMapped]
-            public bool IsExpecting { get => Egg != null; }
-            [NotMapped]
             public bool IsRightAge { get{
                     var boolean = false;
 
@@ -88,7 +85,7 @@ namespace TatsugotchiWebAPI.Model {
             }
 
             [NotMapped]
-            public bool CanBreed { get => (!IsExpecting) && IsRightAge; }
+            public bool CanBreed { get => (!Pregnant) && IsRightAge; }
         #endregion
 
         #region Constructors
@@ -122,12 +119,18 @@ namespace TatsugotchiWebAPI.Model {
         private void SharedAttributes(string name) {
             Name = name;
 
+            Pregnant = false;
+
             //Random Gender
             int r = rand.Next(0, 2);
             Gender = (r == 0 ? AnimalGender.Female : AnimalGender.Male);
+
             AnimalBadges = new List<AnimalBadges>();
 
             AttributeInheritance();
+
+            Tussen = new List<ChildParentAnimal>();
+            TussenKinderen = new List<ChildParentAnimal>();
 
             BirthDate = DateTime.Now;
             Boredom = 0;
@@ -153,7 +156,7 @@ namespace TatsugotchiWebAPI.Model {
                 if (init == null)
                     throw new ArgumentException("First generation needs badges");
 
-                AnimalBadges = Badges.Where(b => b.CalculateInherit())
+                AnimalBadges = init.Where(b => b.CalculateInherit())
                     .Select(b=>new AnimalBadges(b,this)).ToList();
 
                 if (Badges.Count == 0)
@@ -188,7 +191,7 @@ namespace TatsugotchiWebAPI.Model {
         }
 
         //Make breed method
-        private void Breed(Animal partner) {
+        private Egg Breed(Animal partner) {
             if (partner.Gender == Gender)
                 throw new ArgumentException("You need to have two different genders");
 
@@ -201,7 +204,9 @@ namespace TatsugotchiWebAPI.Model {
             var female = (partner.Gender == AnimalGender.Female ? partner : this);
             var male = (female.Equals(partner) ? this : partner);
 
-            female.Egg = new Egg(female, male);
+            female.Pregnant = true;
+            
+            return new Egg(female, male);
         }
         #endregion
     }

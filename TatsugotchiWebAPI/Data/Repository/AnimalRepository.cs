@@ -23,15 +23,17 @@ namespace TatsugotchiWebAPI.Data.Repository {
             }
 
             public ICollection<Animal> GetAllAnimals() {
-                throw new System.NotImplementedException();
+                return _animals.Include(a=>a.AnimalBadges)
+                .Include(a=>a.Tussen).Include(a=>a.TussenKinderen).ToList();
             }
 
             public Animal GetAnimal(int id) {
-                throw new System.NotImplementedException();
+                return GetAllAnimals().FirstOrDefault(a => a.ID == id);
             }
 
             public void RemoveAnimal(Animal animal) {
-                throw new System.NotImplementedException();
+                _animals.Remove(animal);
+                SaveChanges();
             }
 
             public void SaveChanges() {

@@ -69,8 +69,9 @@ namespace TatsugotchiWebAPI.Model {
 
         #region Methods
             public bool CalculateInherit() {
-                if (Inheritable)
-                    return rand.NextDouble() >= Chance;
+            var r = rand.NextDouble();
+            if (Inheritable)
+                return r >= Chance;
 
                 return Inheritable;
             }
