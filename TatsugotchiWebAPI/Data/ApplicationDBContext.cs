@@ -10,6 +10,7 @@ namespace TatsugotchiWebAPI.Data {
 
         public DbSet<Animal> Animals { get; set; }
         public DbSet<Badge> Badges { get; set; }
+        public DbSet<Egg> Eggs { get; set; }
 
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
         : base(options) {

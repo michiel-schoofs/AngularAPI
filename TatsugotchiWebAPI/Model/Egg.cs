@@ -20,7 +20,24 @@ namespace TatsugotchiWebAPI.Model {
         [NotMapped]
         public TimeSpan TimeRemaining { get => (DateConceived.Add(Span)).Subtract(DateTime.Now); }
         [NotMapped]
-        public TimeSpan Span { get; }
+        public TimeSpan Span { get{
+                TimeSpan var = new TimeSpan();
+
+                switch (this.Type) {
+                    case AnimalType.Alpaca:
+                        var.Add(new TimeSpan(5,0,0,0));
+                        break;
+                    case AnimalType.Capybara:
+                        var.Add(new TimeSpan(2, 12, 0, 0));
+                        break;
+                    case AnimalType.Tapir:
+                        var.Add(new TimeSpan(5, 0, 0, 0));
+                        break;
+                }
+
+                return var;
+            }
+        }
 
         public Egg(Animal mother,Animal father) {
             if (mother == null || father == null)

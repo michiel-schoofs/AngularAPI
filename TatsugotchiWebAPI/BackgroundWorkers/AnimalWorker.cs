@@ -9,15 +9,12 @@ namespace TatsugotchiWebAPI.BackgroundWorkers{
     public class AnimalWorker:IWorker{
         private readonly IAnimalRepository _animalRepository;
 
-        public AnimalWorker(ServiceProvider sp):base() {
-            sp.CreateScope();
-            _animalRepository = sp.GetService<IAnimalRepository>();
-
+        public AnimalWorker(IAnimalRepository repo) :base() {
+            _animalRepository = repo;
         }
 
-
         public override void PreformDatabaseActions() {
-            throw new NotImplementedException();
+            System.Diagnostics.Debug.WriteLine("Preformed Animal operation");
         }
     }
 }

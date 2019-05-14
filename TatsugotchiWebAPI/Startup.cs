@@ -16,6 +16,7 @@ using TatsugotchiWebAPI.Data;
 using TatsugotchiWebAPI.Data.Repository;
 using TatsugotchiWebAPI.Model.Interfaces;
 using TatsugotchiWebAPI.BackgroundWorkers;
+using TatsugotchiWebAPI.Scheduler;
 
 namespace TatsugotchiWebAPI {
     public class Startup {
@@ -40,11 +41,14 @@ namespace TatsugotchiWebAPI {
             services.AddScoped<DataInitializer>();
 
             //scope the repositories
-            services.AddScoped<IAnimalRepository, AnimalRepository>();
-            services.AddScoped<IBadgeRepository, BadgeRepository>();
+            services.AddScoped<IAnimalRepository, AnimalRepository>()
+                .AddScoped<IBadgeRepository, BadgeRepository>()
+                .AddScoped<IEggRepository,EggRepository>();
 
             services.AddOpenApiDocument();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            Services = services.BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,12 +67,13 @@ namespace TatsugotchiWebAPI {
             app.UseSwagger();
 
             di.Seed();
-            MakeTimerThread();
+            MakeScheduler();
         }
 
-        public void MakeTimerThread() {
+        public void MakeScheduler() {
             IDictionary<string, int> values = GetTimerValues();
-            Console.WriteLine(values);
+            WorkerScheduler js = new WorkerScheduler(Services, values);
+            js.StartSchedule();
         }
 
 
