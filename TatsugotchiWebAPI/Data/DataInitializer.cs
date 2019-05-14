@@ -13,6 +13,8 @@ namespace TatsugotchiWebAPI.Data.Repository {
         public void Seed() {
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
+            AddBadges();
+            AddAnimals();
         }
 
         public void AddBadges() {

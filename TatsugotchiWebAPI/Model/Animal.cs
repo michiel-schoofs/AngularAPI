@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Threading.Tasks;
 using TatsugotchiWebAPI.Model.EFClasses;
 using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Model {
     public class Animal {
+        #region Consants
+            private static readonly double RunAwayChance = 0.5;
+            private static readonly double StarveChance = 1;
+        #endregion
 
         #region Attributes
             private readonly static Random rand = new Random(); 
@@ -42,6 +45,9 @@ namespace TatsugotchiWebAPI.Model {
 
             [DataType(DataType.DateTime)]
             public DateTime BirthDate { get; set; }
+
+            public bool IsDeceased { get; set; }
+            public bool RanAway { get; set; }
 
         #endregion
 
@@ -134,6 +140,9 @@ namespace TatsugotchiWebAPI.Model {
 
             BirthDate = DateTime.Now;
             Boredom = 0;
+
+            RanAway = false;
+            IsDeceased = false;
         }
 
         //EF Constructor
@@ -207,6 +216,36 @@ namespace TatsugotchiWebAPI.Model {
             female.Pregnant = true;
             
             return new Egg(female, male);
+        }
+
+        public void IncreaseHungerAndBoredom() {
+            if (Hunger >= 100 && Boredom >= 100) {
+                StarveChanceRoll();
+            }else {
+
+                if (Hunger >= 100) {
+                    StarveChanceRoll();
+                    Hunger = 100;
+                } else
+                    Hunger += 1;
+
+                if (Boredom >= 100) {
+                    RunChanceRoll();
+                    Boredom = 100;
+                }
+                else
+                    Boredom += 2;
+            }
+        }
+
+        private void StarveChanceRoll() {
+            int r = rand.Next(0, 1001);
+            IsDeceased = (r <= (StarveChance * 10));
+        }
+
+        private void RunChanceRoll() {
+            int r = rand.Next(0, 1001);
+            RanAway = (r <= (RunAwayChance * 10));
         }
         #endregion
     }

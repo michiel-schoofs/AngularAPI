@@ -14,6 +14,13 @@ namespace TatsugotchiWebAPI.BackgroundWorkers{
         }
 
         public override void PreformDatabaseActions() {
+            var animals = _animalRepository.GetNotDeceasedAnimals();
+
+            foreach(var animal in animals) {
+                animal.IncreaseHungerAndBoredom();
+            }
+
+            _animalRepository.SaveChanges();
             System.Diagnostics.Debug.WriteLine("Preformed Animal operation");
         }
     }
