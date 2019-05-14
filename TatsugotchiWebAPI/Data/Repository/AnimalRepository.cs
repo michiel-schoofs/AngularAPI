@@ -32,7 +32,7 @@ namespace TatsugotchiWebAPI.Data.Repository {
             }
 
             public ICollection<Animal> GetNotDeceasedAnimals() {
-                return GetAllAnimals().Where(a => !a.IsDeceased).ToList();
+                return GetAllAnimals().Where(a => !(a.IsDeceased||a.RanAway)).ToList();
             }
 
             public void RemoveAnimal(Animal animal) {

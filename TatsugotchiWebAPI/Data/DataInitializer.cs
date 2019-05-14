@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Enums;
 
@@ -66,18 +68,59 @@ namespace TatsugotchiWebAPI.Data.Repository {
 
             var animals = new Animal[] {
                 new Animal("Tom",initBadges),
-                new Animal("Emma",initBadges),
-                new Animal("Jan", initBadges),
-                new Animal("Glenn",initBadges),
-                new Animal("Michiel",initBadges),
-                new Animal("Rudolf",initBadges),
-                new Animal("Sien",initBadges),
-                new Animal("Shana",initBadges),
-                new Animal("Ria",initBadges),
-                new Animal("Renée",initBadges)
+                new Animal("Emma",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-10),
+                initBadges,false,false,false,0,0),
+                new Animal("Jan",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-10),
+                initBadges,false,false,false,0,0),
+                new Animal("Glenn",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-25),
+                initBadges,false,false,false,0,0),
+                new Animal("Michiel",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-17),
+                initBadges,false,false,false,0,0),
+                new Animal("Rudolf",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-28),
+                initBadges,false,false,false,0,0),
+                new Animal("Sia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-31),
+                initBadges,true,false,false,0,0),
+                new Animal("Shana",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-12),
+                initBadges,false,true,false,0,0),
+                new Animal("Ria",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-2),
+                initBadges,false,false,false,0,100),
+                new Animal("Renée",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-20),
+                initBadges,false,false,true,100,0),
+                new Animal("Tiana",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-40),
+                initBadges,false,false,false,0,0),
+                new Animal("Olivia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-26),
+                initBadges,false,false,false,0,0),
+                new Animal("Mia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-17),
+                initBadges,false,false,false,0,0),
+                new Animal("Charlotte",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-33),
+                initBadges,false,false,false,0,0)
             };
 
             _context.Animals.AddRange(animals);
+            _context.SaveChanges();
+
+            Breed(animals);
+        }
+
+        public void Breed(Animal[] animals) {
+            Random rand = new Random();
+            List<Egg> eggs = new List<Egg>();
+
+            var Males = animals.Where(a => a.Gender == AnimalGender.Male && a.CanBreed).ToList();
+            var Females = animals.Where(a => a.Gender == AnimalGender.Female && a.CanBreed).ToList();
+
+            foreach(var fa in Females) {
+                var r = rand.Next(0, Males.Count - 1);
+                var x = rand.Next(0, 2);
+
+                if (x == 1) {
+                    eggs.Add(fa.Breed(Males[r]));
+                }else {
+                    eggs.Add(Males[r].Breed(fa));
+                }
+            }
+
+            _context.Eggs.AddRange(eggs);
             _context.SaveChanges();
         }
     }

@@ -5,10 +5,6 @@ using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Model {
     public class Egg {
-        public int MotherID { get; set; }
-        public int FatherID { get; set; }
-
-        
         public int ID { get; set; }
         public Animal Mother { get; set; }
         public Animal Father { get; set; }
@@ -25,13 +21,13 @@ namespace TatsugotchiWebAPI.Model {
 
                 switch (this.Type) {
                     case AnimalType.Alpaca:
-                        var.Add(new TimeSpan(5,0,0,0));
+                        var = new TimeSpan(5,0,0,0);
                         break;
                     case AnimalType.Capybara:
-                        var.Add(new TimeSpan(2, 12, 0, 0));
+                        var = new TimeSpan(2, 12, 0, 0);
                         break;
                     case AnimalType.Tapir:
-                        var.Add(new TimeSpan(5, 0, 0, 0));
+                        var = new TimeSpan(5, 0, 0, 0);
                         break;
                 }
 

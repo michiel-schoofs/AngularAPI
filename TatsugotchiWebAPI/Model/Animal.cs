@@ -91,7 +91,8 @@ namespace TatsugotchiWebAPI.Model {
             }
 
             [NotMapped]
-            public bool CanBreed { get => (!Pregnant) && IsRightAge; }
+            public bool CanBreed { get => (!Pregnant) && IsRightAge
+                && !IsDeceased && !RanAway; }
         #endregion
 
         #region Constructors
@@ -122,6 +123,25 @@ namespace TatsugotchiWebAPI.Model {
             MakeBetweenTableForSelfManyToMany();
         }
 
+        //ForTesting purposes
+        public Animal(string name, AnimalType type, AnimalGender gender, DateTime birthday,
+            List<Badge> InitialBadges, bool deceased = false, bool ranAway = false,
+            bool pregnant = false, int hunger = 0, int boredom = 0) {
+
+            Name = name;
+            Type = type;
+            Gender = gender;
+            BirthDate = birthday;
+
+            BadgeInheritance(InitialBadges);
+            IsDeceased = deceased;
+            RanAway = ranAway;
+
+            Pregnant = pregnant;
+            Hunger = hunger;
+            Boredom = boredom;
+        }
+        
         private void SharedAttributes(string name) {
             Name = name;
 
@@ -200,7 +220,7 @@ namespace TatsugotchiWebAPI.Model {
         }
 
         //Make breed method
-        private Egg Breed(Animal partner) {
+        public Egg Breed(Animal partner) {
             if (partner.Gender == Gender)
                 throw new ArgumentException("You need to have two different genders");
 

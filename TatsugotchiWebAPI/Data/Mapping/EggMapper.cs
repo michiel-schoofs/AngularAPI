@@ -11,12 +11,12 @@ namespace TatsugotchiWebAPI.Data.Mapping {
             builder.Property(e => e.ID)
                 .IsRequired().ValueGeneratedOnAdd();
 
-            builder.HasOne(e => e.Mother).WithOne()
-                .IsRequired().HasForeignKey<Egg>(e=>e.MotherID)
+            builder.HasOne(e => e.Mother).WithMany()
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(e => e.Father).WithOne()
-                .IsRequired().HasForeignKey<Egg>(e=>e.FatherID)
+            builder.HasOne(e => e.Father).WithMany()
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
