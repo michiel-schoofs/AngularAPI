@@ -7,18 +7,18 @@ namespace TatsugotchiWebAPI.Data.Mapping {
         public void Configure(EntityTypeBuilder<ChildParentAnimal> builder) {
             #region Mapping
                 builder.ToTable("Child_Parent");
-                builder.HasKey(cp => new { cp.IDChild, cp.IDParent });
+                builder.HasKey(cp => cp.CP);
+
+                builder.Property(cp => cp.CP).IsRequired().ValueGeneratedOnAdd();
 
                 builder.HasOne(p => p.Child)
-                    .WithMany(a => a.TussenKinderen)
+                    .WithMany(p=>p.Tussen)
                     .IsRequired()
-                    .HasForeignKey(t => t.IDChild)
                     .OnDelete(DeleteBehavior.Cascade);
 
                 builder.HasOne(p => p.Parent)
-                    .WithMany(a => a.Tussen)
+                    .WithMany()
                     .IsRequired()
-                    .HasForeignKey(a => a.IDParent)
                     .OnDelete(DeleteBehavior.Restrict); 
             #endregion
         }

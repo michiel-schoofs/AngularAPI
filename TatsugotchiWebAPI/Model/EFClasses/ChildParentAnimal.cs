@@ -2,10 +2,8 @@
     //Tussen tabel voor EF
     public class ChildParentAnimal {
         #region Properties
-        public int IDParent { get; set; }
+        public int CP { get; set; }
         public Animal Parent { get; set; }
-
-        public int IDChild { get; set; }
         public Animal Child { get; set; }
         #endregion
 

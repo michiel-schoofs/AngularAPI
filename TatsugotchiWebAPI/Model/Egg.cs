@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Model {
     public class Egg {
+        private static readonly string[] names = new string[]{"Kesha","Morton","Glen","Alease","Ermelinda","Aracelis"
+            ,"Clara","Francesco","Trula","Sonya","Maryland","Minerva","Blanch","Jaimee","Wilton","Salena",
+            "Russel","Josphine","Aimee","Kate","Dominique","Carolyne","Tyrone","Vertie","Natosha",
+            "Sherril","Stanford","Ettie","Estelle","Teofila"};
+        private static readonly Random rand = new Random();
+
         public int ID { get; set; }
         public Animal Mother { get; set; }
         public Animal Father { get; set; }
@@ -24,7 +31,10 @@ namespace TatsugotchiWebAPI.Model {
                         var = new TimeSpan(5,0,0,0);
                         break;
                     case AnimalType.Capybara:
+                        var = new TimeSpan(0, 0, 0, 30);
+                        /*Actual value
                         var = new TimeSpan(2, 12, 0, 0);
+                        */
                         break;
                     case AnimalType.Tapir:
                         var = new TimeSpan(5, 0, 0, 0);
@@ -47,6 +57,12 @@ namespace TatsugotchiWebAPI.Model {
 
         //EF Constructor
         protected Egg() {}
+
+        public Animal Hatch() {
+            int r = rand.Next(0, names.Count());
+            Mother.Pregnant = false;
+            return new Animal(names[r], Type, new List<Animal>() { Mother,Father});
+        }
 
     }
 }

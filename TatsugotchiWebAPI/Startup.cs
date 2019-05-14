@@ -31,11 +31,7 @@ namespace TatsugotchiWebAPI {
         public void ConfigureServices(IServiceCollection services) {
 
             //Add db Context and use the connection string found in appsettings.json
-            services.AddDbContext<ApplicationDBContext>(options =>
-              options.UseSqlServer(
-                  Configuration.GetConnectionString("DefaultConnection")
-                  )
-             );
+            services.AddDbContext<ApplicationDBContext>();
 
             //scope data initializer
             services.AddScoped<DataInitializer>();

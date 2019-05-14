@@ -6,17 +6,14 @@ using TatsugotchiWebAPI.Model.EFClasses;
 using TatsugotchiWebAPI.Model.Enums;
 
 namespace TatsugotchiWebAPI.Data {
-    public class ApplicationDBContext : DbContext {
+    public class ApplicationDBContext : DbContext { 
 
         public DbSet<Animal> Animals { get; set; }
         public DbSet<Badge> Badges { get; set; }
         public DbSet<Egg> Eggs { get; set; }
 
-        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options)
-        : base(options) {
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            optionsBuilder.UseSqlServer("Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;");
             base.OnConfiguring(optionsBuilder);
         }
 

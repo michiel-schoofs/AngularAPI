@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TatsugotchiWebAPI.Model;
@@ -17,14 +18,27 @@ namespace TatsugotchiWebAPI.Data.Repository {
         #endregion
 
         #region Interface Methods
-            public void AddAnimal(Animal animal) {
+
+        //Can be called from request and background worker
+        public void AddAnimal(Animal animal, bool isMultithreaded=false) {
+            if (isMultithreaded) {
+
+                using(ApplicationDBContext context = new ApplicationDBContext()) {
+                    context.Badges.Load();
+                    context.Animals.Load();
+                    context.Animals.Add(animal);
+                    context.SaveChanges();
+                }
+
+            }else {
                 _animals.Add(animal);
                 SaveChanges();
             }
+        }
 
-            public ICollection<Animal> GetAllAnimals() {
+        public ICollection<Animal> GetAllAnimals() {
                 return _animals.Include(a=>a.AnimalBadges)
-                .Include(a=>a.Tussen).Include(a=>a.TussenKinderen).ToList();
+                .Include(a=>a.Tussen).ToList();
             }
 
             public Animal GetAnimal(int id) {

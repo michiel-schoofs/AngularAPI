@@ -61,11 +61,8 @@ namespace TatsugotchiWebAPI.Model {
             [NotMapped]
             public List<Badge> Badges { get => AnimalBadges.Select(ab => ab.Badge).ToList(); }
             public List<ChildParentAnimal> Tussen { get; set; }
-            public List<ChildParentAnimal> TussenKinderen { get; set; }
             [NotMapped]
             public List<Animal> Parents { get => Tussen.Select(c => c.Parent).ToList(); }
-            [NotMapped]
-            public List<Animal> Children { get => TussenKinderen.Select(c => c.Child).ToList(); }
         #endregion
 
         #region Calculated Attributes
@@ -113,7 +110,7 @@ namespace TatsugotchiWebAPI.Model {
         }
 
         //Has parents constructor
-        protected Animal(string name, AnimalType type,List<Animal> parents) {
+        public Animal(string name, AnimalType type,List<Animal> parents) {
             this.parents = parents;
             this.Type = type;
 
@@ -156,7 +153,6 @@ namespace TatsugotchiWebAPI.Model {
             AttributeInheritance();
 
             Tussen = new List<ChildParentAnimal>();
-            TussenKinderen = new List<ChildParentAnimal>();
 
             BirthDate = DateTime.Now;
             Boredom = 0;
@@ -173,7 +169,7 @@ namespace TatsugotchiWebAPI.Model {
         private void BadgeInheritance(List<Badge> init = null) {
             if (parents != null) {
                 AnimalBadges = parents.SelectMany(a => a.Badges)
-                    .Where(b => b.CalculateInherit() == true)
+                    .ToHashSet().Where(b => b.CalculateInherit() == true)
                     .Select(b=>new AnimalBadges(b,this))
                     .ToList();
 
@@ -217,6 +213,7 @@ namespace TatsugotchiWebAPI.Model {
                 throw new ArgumentException("An animal can only have two or no parents (First generation)");
 
             Tussen = parents.Select(p => new ChildParentAnimal(p, this)).ToList();
+            Console.WriteLine(Tussen);
         }
 
         //Make breed method

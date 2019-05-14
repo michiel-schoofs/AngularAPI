@@ -7,7 +7,7 @@ namespace TatsugotchiWebAPI.Model.Interfaces {
             ICollection<Animal> GetNotDeceasedAnimals();
             Animal GetAnimal(int id);
             void RemoveAnimal(Animal animal);
-            void AddAnimal(Animal animal);
+            void AddAnimal(Animal animal,bool isMultithreaded=false);
             void SaveChanges(); 
         #endregion
     }
