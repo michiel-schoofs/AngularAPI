@@ -24,8 +24,6 @@ namespace TatsugotchiWebAPI {
         }
 
         public IConfiguration Configuration { get; }
-        private int _timerTime;
-        private Timer _animalTimer;
         public ServiceProvider Services { get; private set; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
@@ -47,9 +45,6 @@ namespace TatsugotchiWebAPI {
 
             services.AddOpenApiDocument();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            _timerTime = Configuration.GetValue<int>("TimerEventPeriod");
-            Services = services.BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,30 +66,27 @@ namespace TatsugotchiWebAPI {
             MakeTimerThread();
         }
 
-        //Initializes timer, creates diffrent thread
         public void MakeTimerThread() {
-            _animalTimer = new Timer(_timerTime);
-            //Creates worker and make it subscribe
-            AnimalWorker aw = new AnimalWorker(Services);
-            aw.InitWorker();
-            aw.AnimalWorkerComplete += OnWorkerCompleted;
-
-            _animalTimer.Elapsed += (source,args) => OnTimedEvent(source,args,aw);
-            _animalTimer.Start();
+            IDictionary<string, int> values = GetTimerValues();
+            Console.WriteLine(values);
         }
 
-        //Delegate the worker to do stuff
-        public void OnTimedEvent(Object source,ElapsedEventArgs a,AnimalWorker aw) {
-            System.Diagnostics.Debug.WriteLine("Timed event raised");
-            aw.RunWorker();
-            _animalTimer.Stop();
-        }
 
-        //Restart timer if worker completed
-        public void OnWorkerCompleted(object source, EventArgs e) {
-            System.Diagnostics.Debug.WriteLine("Timer starting");
-            _animalTimer.Start();
-        }
+        private IDictionary<string,int> GetTimerValues() {
+            var x = Configuration.GetSection("Timers").GetChildren();
 
+            IDictionary<string, int> dic = new Dictionary<string, int>();
+            foreach (var obj in x) {
+                try {
+                    dic.Add(obj.Key, Int32.Parse(obj.Value));
+                }
+                catch (Exception e) {
+                    System.Diagnostics.Debug.WriteLine("Configuration file timers not formated correctly");
+                    continue;
+                }
+            }
+
+            return dic;
+        }
     }
 }
