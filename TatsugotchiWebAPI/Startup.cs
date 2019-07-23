@@ -41,7 +41,12 @@ namespace TatsugotchiWebAPI {
                 .AddScoped<IBadgeRepository, BadgeRepository>()
                 .AddScoped<IEggRepository,EggRepository>();
 
-            services.AddOpenApiDocument();
+            services.AddOpenApiDocument(d=> {
+                d.Description = "The cutest API for the cutest animals around";
+                d.Version = "Alpha";
+                d.Title = "Tatsugotchi";
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             Services = services.BuildServiceProvider();
