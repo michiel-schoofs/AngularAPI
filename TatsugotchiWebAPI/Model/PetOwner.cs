@@ -13,11 +13,12 @@ namespace TatsugotchiWebAPI.Model
             public string Username { get; set; }
             public string Email { get; set; }
             public DateTime BirthDay { get; set; }
+            public Image Image { get; set; }
+            public bool HasImage { get => Image != null; }
         #endregion
 
         #region Constructors
-            public PetOwner(RegisterDTO rdto)
-            {
+            public PetOwner(RegisterDTO rdto){
                 BirthDay = rdto.BirthDay;
                 Email = rdto.Email;
                 Username = rdto.Username;

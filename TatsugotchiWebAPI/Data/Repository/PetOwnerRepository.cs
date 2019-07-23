@@ -23,6 +23,10 @@ namespace TatsugotchiWebAPI.Data.Repository
             return _users.Select(u => u.Email).Contains(email);
         }
 
+        public PetOwner GetByEmail(string email){
+            return _users.FirstOrDefault(f => f.Email == email);
+        }
+
         public void RemovePO(PetOwner user){
             _users.Remove(user);
         }
