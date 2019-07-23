@@ -4,13 +4,15 @@ using TatsugotchiWebAPI.Model;
 using System.Linq;
 using TatsugotchiWebAPI.Model.EFClasses;
 using TatsugotchiWebAPI.Model.Enums;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace TatsugotchiWebAPI.Data {
-    public class ApplicationDBContext : DbContext { 
+    public class ApplicationDBContext : IdentityDbContext { 
 
         public DbSet<Animal> Animals { get; set; }
         public DbSet<Badge> Badges { get; set; }
         public DbSet<Egg> Eggs { get; set; }
+        public DbSet<PetOwner> PetOwners { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseSqlServer("Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;");
@@ -24,7 +26,8 @@ namespace TatsugotchiWebAPI.Data {
                 .ApplyConfiguration<ChildParentAnimal>(new ChildParenAnimalMapper())
                 .ApplyConfiguration<AnimalBadges>(new AnimalBadgesMapper())
                 .ApplyConfiguration<Badge>(new BadgesMapper())
-                .ApplyConfiguration<Egg>(new EggMapper());
+                .ApplyConfiguration<Egg>(new EggMapper())
+                .ApplyConfiguration<PetOwner>(new PetOwnerMapper());
         }
 
     }
