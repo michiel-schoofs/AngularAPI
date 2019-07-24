@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using TatsugotchiWebAPI.DTO;
+using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Interfaces;
 
 namespace TatsugotchiWebAPI.Controllers
@@ -18,11 +19,15 @@ namespace TatsugotchiWebAPI.Controllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PetOwnerController : ControllerBase{
         private readonly IPetOwnerRepository _poRepo;
+        private readonly IImageRepository _imageRepo;
         private readonly IConfiguration _config;
 
-        public PetOwnerController(IPetOwnerRepository repo,IConfiguration config){
+        public PetOwnerController(IPetOwnerRepository repo,IConfiguration config
+            ,IImageRepository imageRepo){
+
             _poRepo = repo;
             _config = config;
+            _imageRepo = imageRepo;
         }
 
         [HttpGet("image")]
@@ -34,6 +39,21 @@ namespace TatsugotchiWebAPI.Controllers
             }else { 
                 return new ImageDTO() { Data = _config.GetValue<string>("DefaultImage") };
             }
+        }
+
+        [HttpPut("image/update")]
+        public ActionResult PostImage(ImageDTO imageDTO){
+            Image img = new Image(imageDTO);
+            var user = _poRepo.GetByEmail(User.Identity.Name);
+
+            //Remove the previous image
+            if (user.HasImage) {
+                _imageRepo.RemoveImage(user.Image);
+            }
+
+            user.Image = img;
+            _poRepo.SaveChanges();
+            return CreatedAtAction(nameof(GetImage),imageDTO );
         }
     }
 }

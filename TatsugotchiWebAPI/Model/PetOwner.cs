@@ -27,6 +27,5 @@ namespace TatsugotchiWebAPI.Model
             //EF Constructor
             protected PetOwner() { } 
         #endregion
-
     }
 }
