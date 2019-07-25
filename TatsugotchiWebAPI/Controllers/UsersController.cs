@@ -1,111 +1,140 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using TatsugotchiWebAPI.DTO;
-using TatsugotchiWebAPI.Model;
-using TatsugotchiWebAPI.Model.Interfaces;
+﻿#region Imports
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.IdentityModel.Tokens;
+    using System;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using System.Text;
+    using System.Threading.Tasks;
+    using TatsugotchiWebAPI.DTO;
+    using TatsugotchiWebAPI.Model;
+    using TatsugotchiWebAPI.Model.Interfaces; 
+#endregion
 
 namespace TatsugotchiWebAPI.Controllers
 {
+    /// <summary>
+    /// Api to register and login a user.
+    /// </summary>
     [Route("api/[Controller]")]
     [ApiController]
     public class UsersController:ControllerBase
     {
-        public IPetOwnerRepository POR{ get; set; }
-        public UserManager<IdentityUser> UM { get; set; }
-        private readonly SignInManager<IdentityUser> _sim;
-        private readonly IConfiguration _config;
+        #region Fields
+            public IPetOwnerRepository POR { get; set; }
+            public UserManager<IdentityUser> UM { get; set; }
+            private readonly SignInManager<IdentityUser> _sim;
+            private readonly IConfiguration _config;
+        #endregion
 
-        public UsersController(IPetOwnerRepository por,UserManager<IdentityUser> um
-            ,IConfiguration configuration,SignInManager<IdentityUser> sim){
+        #region Constructor
+            public UsersController(IPetOwnerRepository por, UserManager<IdentityUser> um
+                   , IConfiguration configuration, SignInManager<IdentityUser> sim){
+                POR = por;
+                UM = um;
 
-            POR = por;
-            UM = um;
+                _config = configuration;
+                _sim = sim;
+            }
+        #endregion
 
-            _config = configuration;
-            _sim = sim;
-        }
+        #region Api methods
+            /// <summary>
+            /// Login using a dto and returns a token that's passed to the front end for authentication
+            /// </summary>
+            /// <param name="loginDTO">The dto containing the username and the password used for logging in</param>
+            /// <returns>A cookie used to identify the user.</returns>
+            [AllowAnonymous]
+            [HttpPost("login")]
+            public async Task<ActionResult<string>> Login(LoginDTO loginDTO)
+            {
+                var user = await UM.FindByNameAsync(loginDTO.Email);
 
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(LoginDTO loginDTO){
-            var user = await UM.FindByNameAsync(loginDTO.Email);
+                if (user != null)
+                {
+                    bool canSignIn = await _sim.CanSignInAsync(user);
 
-            if (user != null){
-               bool canSignIn = await _sim.CanSignInAsync(user);
+                    if (canSignIn)
+                    {
 
-                if (canSignIn){
+                        var res = await _sim.CheckPasswordSignInAsync(user, loginDTO.Password, false);
+                        if (res.Succeeded)
+                        {
+                            string token = GetToken(user);
+                            return Created("", token);
+                        }
+                        else
+                            ModelState.AddModelError("Error", "The password is incorrect");
+                    }
+                    else
+                        ModelState.AddModelError("Error", "This user can't sign in");
 
-                    var res = await _sim.CheckPasswordSignInAsync(user, loginDTO.Password, false);
-                    if (res.Succeeded){
-                        string token = GetToken(user);
-                        return Created("", token);
-                    }else
-                        ModelState.AddModelError("Error", "The password is incorrect");
                 }
                 else
-                    ModelState.AddModelError("Error", "This user can't sign in");
+                    ModelState.AddModelError("Error", "We couldn't find the user with that e-mailadres");
 
-            }
-            else
-                ModelState.AddModelError("Error", "We couldn't find the user with that e-mailadres");
-
-            return BadRequest(ModelState);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult<string>> Register(RegisterDTO registerDTO) {
-            if (POR.EmailExists(registerDTO.Email))
-                ModelState.AddModelError("Error", "Email is not unique");
-            else {
-                IdentityUser iu = new IdentityUser(){UserName = registerDTO.Email,Email = registerDTO.Email };
-                PetOwner po = new PetOwner(registerDTO);
-                var res = await UM.CreateAsync(iu, registerDTO.Password);
-
-                if (res.Succeeded){
-                    POR.AddPO(po);
-                    POR.SaveChanges();
-                    string token = GetToken(iu);
-                    return Created("", token);
-                }
-                else{
-                    ModelState.AddModelError("Error", "Something went wrong in the registration process");
-                }
+                return BadRequest(ModelState);
             }
 
-            return BadRequest(ModelState);
-        }
-
-        private String GetToken(IdentityUser user)
-        {
-            // Create the token
-            var claims = new[]
+            /// <summary>
+            /// Register the user using a dto containing all the details.Also returns a token that's used to identify the user
+            /// </summary>
+            /// <param name="registerDTO">A dto containing all the information needed to identify a user.</param>
+            /// <returns>A cookie that's passed to the frontend to identify the user.</returns>
+            [AllowAnonymous]
+            [HttpPost("register")]
+            public async Task<ActionResult<string>> Register(RegisterDTO registerDTO)
             {
-              new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-              new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
-            };
+                if (POR.EmailExists(registerDTO.Email))
+                    ModelState.AddModelError("Error", "Email is not unique");
+                else
+                {
+                    IdentityUser iu = new IdentityUser() { UserName = registerDTO.Email, Email = registerDTO.Email };
+                    PetOwner po = new PetOwner(registerDTO);
+                    var res = await UM.CreateAsync(iu, registerDTO.Password);
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
+                    if (res.Succeeded)
+                    {
+                        POR.AddPO(po);
+                        POR.SaveChanges();
+                        string token = GetToken(iu);
+                        return Created("", token);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Error", "Something went wrong in the registration process");
+                    }
+                }
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                return BadRequest(ModelState);
+            }
+        #endregion
 
-            var token = new JwtSecurityToken(
-              null, null,
-              claims,
-              expires: DateTime.Now.AddHours(4),
-              signingCredentials: creds);
+        #region Method to generate the cookie
+            private String GetToken(IdentityUser user)
+            {
+                // Create the token
+                var claims = new[]
+                {
+                  new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                  new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
+                };
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"]));
+
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                var token = new JwtSecurityToken(
+                  null, null,
+                  claims,
+                  expires: DateTime.Now.AddHours(4),
+                  signingCredentials: creds);
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            } 
+        #endregion
     }
 }

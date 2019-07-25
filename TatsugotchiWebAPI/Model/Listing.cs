@@ -7,18 +7,20 @@ using TatsugotchiWebAPI.Model.Exceptions;
 namespace TatsugotchiWebAPI.Model
 {
     public class Listing{
-        #region Properties
+        #region Simple Properties
             public int ID { get; set; }
-
-            public Animal Animal { get; set; }
-            public int AnimalID { get; set; }
-
             public bool IsAdoptable { get; set; }
             public bool IsBreedable { get; set; }
             public int AdoptAmount { get; set; }
             public int BreedAmount { get; set; }
         #endregion
 
+        #region Associations
+            public Animal Animal { get; set; }
+            public int AnimalID { get; set; }
+            public PetOwner Owner { get; set; }
+        #endregion
+        
         //EF be retarded
         protected Listing(){}
 

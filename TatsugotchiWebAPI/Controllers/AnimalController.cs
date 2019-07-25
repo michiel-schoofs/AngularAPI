@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿#region Imports
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Interfaces;
 using System.Linq;
 using TatsugotchiWebAPI.DTO;
-using System.Collections.Generic;
+using System.Collections.Generic; 
+#endregion
 
 namespace TatsugotchiWebAPI.Controllers
 {
