@@ -24,7 +24,9 @@ namespace TatsugotchiWebAPI.Data.Repository
         }
 
         public PetOwner GetByEmail(string email){
-            return _users.Include(po=>po.Image)
+            return _users
+                .Include(po=>po.Image)
+                .Include(po=>po.Animals)
                 .FirstOrDefault(f => f.Email == email);
         }
 

@@ -63,6 +63,8 @@ namespace TatsugotchiWebAPI.Model {
             public List<ChildParentAnimal> Tussen { get; set; }
             [NotMapped]
             public List<Animal> Parents { get => Tussen.Select(c => c.Parent).ToList(); }
+
+            public PetOwner Owner { get; set; }
         #endregion
 
         #region Calculated Attributes
@@ -94,7 +96,7 @@ namespace TatsugotchiWebAPI.Model {
 
         #region Constructors
         //First gen constructor
-        public Animal(string name, List<Badge> InitialBadges) {
+        public Animal(string name, List<Badge> InitialBadges,PetOwner po) {
             SharedAttributes(name);
             BadgeInheritance(InitialBadges);
 
@@ -107,6 +109,8 @@ namespace TatsugotchiWebAPI.Model {
                 else
                     this.Type = AnimalType.Alpaca;
             }
+
+            Owner = po;
         }
 
         //Has parents constructor

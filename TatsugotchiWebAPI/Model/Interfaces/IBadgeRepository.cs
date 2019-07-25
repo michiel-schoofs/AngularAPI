@@ -3,7 +3,7 @@
 namespace TatsugotchiWebAPI.Model.Interfaces {
     public interface IBadgeRepository {
         #region Interface Methods
-        ICollection<Badge> GiveInitialBadges();
+        List<Badge> GiveInitialBadges();
         void AddBadge(Badge badge);
         #endregion
     }

@@ -26,7 +26,7 @@ namespace TatsugotchiWebAPI.Data.Repository {
             SaveChanges();
         }
 
-        public ICollection<Badge> GiveInitialBadges() {
+        public List<Badge> GiveInitialBadges() {
             return _badges.Where(b => b.IsInit).ToList();
         } 
 

@@ -67,7 +67,6 @@ namespace TatsugotchiWebAPI.Data.Repository {
             var initBadges = _context.Badges.Where(b => b.IsInit).ToList();
 
             var animals = new Animal[] {
-                new Animal("Tom",initBadges),
                 new Animal("Emma",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-10),
                 initBadges,false,false,false,0,0),
                 new Animal("Jan",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-10),
