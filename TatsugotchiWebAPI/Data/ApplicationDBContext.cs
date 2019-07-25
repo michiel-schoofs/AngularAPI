@@ -28,7 +28,8 @@ namespace TatsugotchiWebAPI.Data {
                 .ApplyConfiguration<AnimalBadges>(new AnimalBadgesMapper())
                 .ApplyConfiguration<Badge>(new BadgesMapper())
                 .ApplyConfiguration<Egg>(new EggMapper())
-                .ApplyConfiguration<PetOwner>(new PetOwnerMapper());
+                .ApplyConfiguration<PetOwner>(new PetOwnerMapper())
+                .ApplyConfiguration<Listing>(new ListingMapper());
         }
 
     }

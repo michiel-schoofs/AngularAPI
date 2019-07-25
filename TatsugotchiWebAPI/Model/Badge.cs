@@ -42,13 +42,6 @@ namespace TatsugotchiWebAPI.Model {
         #region Calculated Attributes
             [NotMapped]
             public bool Inheritable { get => Chance != 0;}
-            [NotMapped]
-            public string IconLink {
-                get {
-                    string ico = Enum.GetName(typeof(BadgeType), Type);
-                    return $"{_imagePath}\\{ico}.png";
-                }
-            }
 
             [NotMapped]
             public int Value { get => 100 - (int)(Chance * 10); }

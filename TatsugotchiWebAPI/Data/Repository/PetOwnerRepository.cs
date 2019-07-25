@@ -2,6 +2,7 @@
 using TatsugotchiWebAPI.Model;
 using System.Linq;
 using TatsugotchiWebAPI.Model.Interfaces;
+using TatsugotchiWebAPI.Model.EFClasses;
 
 namespace TatsugotchiWebAPI.Data.Repository
 {
@@ -25,8 +26,14 @@ namespace TatsugotchiWebAPI.Data.Repository
 
         public PetOwner GetByEmail(string email){
             return _users
-                .Include(po=>po.Image)
+                .Include(po => po.Image)
+                .Include(po => po.FavoriteAnimal)
+                    .ThenInclude(a => a.AnimalBadges)
+                        .ThenInclude(ab => ab.Badge)
                 .Include(po=>po.Animals)
+                    .ThenInclude(a => a.AnimalBadges)
+                        .ThenInclude(ab => ab.Badge)
+                .Include(po=>po.Listings)
                 .FirstOrDefault(f => f.Email == email);
         }
 

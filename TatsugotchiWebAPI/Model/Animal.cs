@@ -69,8 +69,6 @@ namespace TatsugotchiWebAPI.Model {
 
         #region Calculated Attributes
             [NotMapped]
-            public string Image { get; protected set; }
-            [NotMapped]
              public int Age { get => (DateTime.Now.Subtract(BirthDate).Days) / 5; }
             [NotMapped]
             public bool IsRightAge { get{
@@ -92,6 +90,9 @@ namespace TatsugotchiWebAPI.Model {
             [NotMapped]
             public bool CanBreed { get => (!Pregnant) && IsRightAge
                 && !IsDeceased && !RanAway; }
+
+            [NotMapped]
+            public int AnimalValue { get => Badges.Select(b => b.Value).Sum(); }
         #endregion
 
         #region Constructors

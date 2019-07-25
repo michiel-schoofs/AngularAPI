@@ -32,7 +32,7 @@ namespace TatsugotchiWebAPI.Controllers
 
         [HttpGet("image")]
         public ActionResult<ImageDTO> GetImage(){
-            var user = _poRepo.GetByEmail(User.Identity.Name);
+            var user = GetOwner();
 
             if (user.HasImage){
                 return new ImageDTO() { Data = user.Image.ToString() };
@@ -41,10 +41,12 @@ namespace TatsugotchiWebAPI.Controllers
             }
         }
 
+
+
         [HttpPut("image/update")]
         public ActionResult PostImage(ImageDTO imageDTO){
             Image img = new Image(imageDTO);
-            var user = _poRepo.GetByEmail(User.Identity.Name);
+            var user = GetOwner();
 
             //Remove the previous image
             if (user.HasImage) {
@@ -54,6 +56,10 @@ namespace TatsugotchiWebAPI.Controllers
             user.Image = img;
             _poRepo.SaveChanges();
             return CreatedAtAction(nameof(GetImage),imageDTO );
+        }
+
+        private PetOwner GetOwner(){
+           return _poRepo.GetByEmail(User.Identity.Name);
         }
     }
 }
