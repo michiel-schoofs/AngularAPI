@@ -1,8 +1,12 @@
 ﻿#region Imports
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
+using System.Linq;
 using TatsugotchiWebAPI.DTO;
 using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Interfaces;
@@ -21,16 +25,18 @@ namespace TatsugotchiWebAPI.Controllers
             private readonly IPetOwnerRepository _poRepo;
             private readonly IImageRepository _imageRepo;
             private readonly IConfiguration _config;
+            private readonly UserManager<IdentityUser> _um;
         #endregion
 
         #region Constructor
             public PetOwnerController(IPetOwnerRepository repo, IConfiguration config
-        , IImageRepository imageRepo)
+                  ,IImageRepository imageRepo, UserManager<IdentityUser> um)
             {
 
                 _poRepo = repo;
                 _config = config;
                 _imageRepo = imageRepo;
+                _um = um;
             }
         #endregion
 
@@ -53,7 +59,24 @@ namespace TatsugotchiWebAPI.Controllers
                     return new ImageDTO() { Data = _config.GetValue<string>("DefaultImage") };
                 }
             }
+            
+            /// <summary>
+            /// Deletes the current user that's logged in
+            /// </summary>
+            /// <returns>Ok if the user was succesfully deleted</returns>
+            [HttpDelete("delete")]
+            public async Task<ActionResult> DeleteAccount(){
+                PetOwner po = GetOwner();
 
+                _poRepo.RemovePO(po);
+
+                var user = await _um.FindByEmailAsync(po.Email);
+                await _um.DeleteAsync(user);
+
+                _poRepo.SaveChanges();
+                
+                return Ok();
+            }
 
             /// <summary>
             /// Updates the users Image 

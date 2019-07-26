@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using TatsugotchiWebAPI.DTO;
@@ -17,7 +18,8 @@ namespace TatsugotchiWebAPI.Model
         #endregion
 
         #region Associations
-            public Animal FavoriteAnimal { get; set; }
+            [NotMapped]
+            public Animal FavoriteAnimal { get => Animals.FirstOrDefault(a => a.IsFavorite); }
             public ICollection<Animal> Animals { get; set; }
             public ICollection<Listing> Listings { get; set; }
             public Image Image { get; set; }

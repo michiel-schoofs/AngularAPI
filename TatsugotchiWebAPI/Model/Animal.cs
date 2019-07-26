@@ -47,8 +47,8 @@ namespace TatsugotchiWebAPI.Model {
             public DateTime BirthDate { get; set; }
 
             public bool IsDeceased { get; set; }
-            public bool RanAway { get; set; }
-
+            public bool RanAway { get; set; }        
+            public bool IsFavorite { get; set; }
         #endregion
 
         #region Associations

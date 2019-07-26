@@ -62,13 +62,13 @@ namespace TatsugotchiWebAPI.Controllers
                     Animal an = new Animal(name, initBadges, own);
 
                     own.Animals.Add(an);
-                    own.FavoriteAnimal = an;
+                    an.IsFavorite = true;
                     _animalRepo.SaveChanges();
 
                     return CreatedAtAction(nameof(GetAnimal), new { id = an.ID }, new AnimalDTO(an));
                 }
 
-                if (own.Animals.Count() != 0)
+               if (own.Animals.Count() != 0)
                     ModelState.AddModelError("Error Animals", "You already have animals");
 
                 if (string.IsNullOrEmpty(name))
@@ -97,7 +97,11 @@ namespace TatsugotchiWebAPI.Controllers
                 {
                     if (animal.Owner == own)
                     {
-                        own.FavoriteAnimal = animal;
+                        //If user has a favorite then set the favorite to false
+                        if (own.FavoriteAnimal != null)
+                            own.FavoriteAnimal.IsFavorite = false;
+
+                        animal.IsFavorite = true;
                         _animalRepo.SaveChanges();
                         return CreatedAtAction(nameof(GetFavoriteAnimal), 
                                                 new AnimalDTO(own.FavoriteAnimal));

@@ -14,6 +14,12 @@ namespace TatsugotchiWebAPI.Data.Mapping
             builder.Property(po => po.UserID).IsRequired().ValueGeneratedOnAdd();
 
             builder.Property(po => po.Username).IsRequired().HasMaxLength(20);
+
+            builder
+                .HasMany(po => po.Animals)
+                .WithOne(a => a.Owner)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

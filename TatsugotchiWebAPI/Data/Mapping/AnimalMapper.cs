@@ -15,9 +15,6 @@ namespace TatsugotchiWebAPI.Data.Mapping {
             builder.Property(a => a.Name).IsRequired().HasMaxLength(50);
 
             builder.Property(a => a.Speed).IsRequired();
-
-            builder.HasOne(a => a.Owner).WithMany(o => o.Animals)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
