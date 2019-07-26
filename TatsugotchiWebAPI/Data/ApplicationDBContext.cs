@@ -24,12 +24,12 @@ namespace TatsugotchiWebAPI.Data {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration<Animal>(new AnimalMapper())
-                .ApplyConfiguration<ChildParentAnimal>(new ChildParenAnimalMapper())
                 .ApplyConfiguration<AnimalBadges>(new AnimalBadgesMapper())
                 .ApplyConfiguration<Badge>(new BadgesMapper())
                 .ApplyConfiguration<Egg>(new EggMapper())
                 .ApplyConfiguration<PetOwner>(new PetOwnerMapper())
-                .ApplyConfiguration<Listing>(new ListingMapper());
+                .ApplyConfiguration<Listing>(new ListingMapper())
+                .ApplyConfiguration<AnimalEgg>(new AnimalEggMapper());
         }
 
     }

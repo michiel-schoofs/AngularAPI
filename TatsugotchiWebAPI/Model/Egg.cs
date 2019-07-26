@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using TatsugotchiWebAPI.Model.Enums;
+using TatsugotchiWebAPI.Model.EFClasses;
 
 namespace TatsugotchiWebAPI.Model {
     public class Egg {
@@ -13,8 +14,15 @@ namespace TatsugotchiWebAPI.Model {
         private static readonly Random rand = new Random();
 
         public int ID { get; set; }
-        public Animal Mother { get; set; }
-        public Animal Father { get; set; }
+
+        public List<AnimalEgg> AnimalEggs { get; set; }
+        [NotMapped]
+        public List<Animal> Parents { get => AnimalEggs.Select(ae =>ae.An).ToList(); }
+        [NotMapped]
+        public Animal Mother { get => Parents.FirstOrDefault(a => a.Gender == AnimalGender.Female); }
+        [NotMapped]
+        public Animal Father { get => Parents.FirstOrDefault(a => a.Gender == AnimalGender.Male); }
+
         public DateTime DateConceived { get; set; }
         public AnimalType Type { get; set; }
 
@@ -49,8 +57,11 @@ namespace TatsugotchiWebAPI.Model {
             if (mother == null || father == null)
                 throw new ArgumentException("Neither of the parents can be null");
 
-            Mother = mother;
-            Father = father;
+            AnimalEggs = new List<AnimalEgg>();
+
+            AnimalEggs.Add(new AnimalEgg() { An = mother, Egg = this });
+            AnimalEggs.Add(new AnimalEgg() { An = father, Egg = this });
+
             DateConceived = DateTime.Now;
             Type = Mother.Type;
         }

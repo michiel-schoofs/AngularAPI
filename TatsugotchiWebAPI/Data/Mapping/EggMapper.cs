@@ -10,14 +10,6 @@ namespace TatsugotchiWebAPI.Data.Mapping {
             builder.HasKey(e => e.ID);
             builder.Property(e => e.ID)
                 .IsRequired().ValueGeneratedOnAdd();
-
-            builder.HasOne(e => e.Mother).WithMany()
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(e => e.Father).WithMany()
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -60,9 +60,9 @@ namespace TatsugotchiWebAPI.Model {
             public List<AnimalBadges> AnimalBadges { get; set; }
             [NotMapped]
             public List<Badge> Badges { get => AnimalBadges.Select(ab => ab.Badge).ToList(); }
-            public List<ChildParentAnimal> Tussen { get; set; }
-            [NotMapped]
-            public List<Animal> Parents { get => Tussen.Select(c => c.Parent).ToList(); }
+
+            
+            public List<AnimalEgg> AnimalEggs { get; set; }    
 
             public PetOwner Owner { get; set; }
         #endregion
@@ -122,7 +122,6 @@ namespace TatsugotchiWebAPI.Model {
             SharedAttributes(name);
             BadgeInheritance();
 
-            MakeBetweenTableForSelfManyToMany();
         }
 
         //ForTesting purposes
@@ -130,6 +129,7 @@ namespace TatsugotchiWebAPI.Model {
             List<Badge> InitialBadges, bool deceased = false, bool ranAway = false,
             bool pregnant = false, int hunger = 0, int boredom = 0, PetOwner po = null) {
 
+            AnimalEggs = new List<AnimalEgg>();
             Name = name;
             Type = type;
             Gender = gender;
@@ -159,13 +159,13 @@ namespace TatsugotchiWebAPI.Model {
 
             AttributeInheritance();
 
-            Tussen = new List<ChildParentAnimal>();
-
             BirthDate = DateTime.Now;
             Boredom = 0;
 
             RanAway = false;
             IsDeceased = false;
+
+            AnimalEggs = new List<AnimalEgg>();
         }
 
         //EF Constructor
@@ -215,14 +215,6 @@ namespace TatsugotchiWebAPI.Model {
             }
         } 
 
-        private void MakeBetweenTableForSelfManyToMany() {
-            if (parents != null && parents.Count != 2)
-                throw new ArgumentException("An animal can only have two or no parents (First generation)");
-
-            Tussen = parents.Select(p => new ChildParentAnimal(p, this)).ToList();
-            Console.WriteLine(Tussen);
-        }
-
         //Make breed method
         public Egg Breed(Animal partner) {
             if (partner.Gender == Gender)
@@ -238,8 +230,9 @@ namespace TatsugotchiWebAPI.Model {
             var male = (female.Equals(partner) ? this : partner);
 
             female.Pregnant = true;
-            
-            return new Egg(female, male);
+
+            var egg = new Egg(female, male);
+            return egg;
         }
 
         public void IncreaseHungerAndBoredom() {

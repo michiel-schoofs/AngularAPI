@@ -30,6 +30,9 @@ namespace TatsugotchiWebAPI.Data.Repository
                 .Include(po=>po.Animals)
                     .ThenInclude(a => a.AnimalBadges)
                         .ThenInclude(ab => ab.Badge)
+                .Include(po=>po.Animals)
+                    .ThenInclude(a=>a.AnimalEggs)
+                        .ThenInclude(ae => ae.Egg)
                 .Include(po=>po.Listings)
                 .FirstOrDefault(f => f.Email == email);
         }
