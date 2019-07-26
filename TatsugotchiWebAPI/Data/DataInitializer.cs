@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using TatsugotchiWebAPI.DTO;
 using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Enums;
 
@@ -8,19 +10,59 @@ namespace TatsugotchiWebAPI.Data.Repository {
     public class DataInitializer {
         private ApplicationDBContext _context { get; set; }
 
-        public DataInitializer(ApplicationDBContext context) {
+        private UserManager<IdentityUser> _um;
+        private ICollection<PetOwner> _petOwners;
+
+        public DataInitializer(ApplicationDBContext context
+            ,UserManager<IdentityUser> um) {
             _context = context;
+            _petOwners = new List<PetOwner>();
+
+            _um = um;
         }
 
         public void Seed() {
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
+            AddUsers();
             AddBadges();
             AddAnimals();
+            AddSpecialCases();
+        }
+
+        private void AddUsers(){
+            //web4 gelukkiggeennetbeans
+            RegisterDTO dto = new RegisterDTO()
+            {
+                Email = "web4@hogent.be",
+                BirthDay = DateTime.Now.AddYears(-25),
+                Password = "gelukkiggeennetbeans",
+                Username = "web4"
+            };
+
+            PetOwner po = new PetOwner(dto);
+            _context.PetOwners.Add(po);
+            _um.CreateAsync(new IdentityUser() { UserName = dto.Email, Email = dto.Email }, dto.Password).Wait();
+            _petOwners.Add(po);
+
+            dto = new RegisterDTO(){
+                Email = "test@mail.be",
+                BirthDay = DateTime.Now.AddYears(-22),
+                Password = "string12345",
+                Username = "test"
+            };
+
+            po = new PetOwner(dto);
+            _context.PetOwners.Add(po);
+            _um.CreateAsync(new IdentityUser() { UserName = dto.Email, Email = dto.Email },dto.Password).Wait();
+            _petOwners.Add(po);
+
+            _context.SaveChanges();
         }
 
         public void AddBadges() {
             var badges = new Badge[] {
+
                 //Negative Badges
                 new Badge("Ieuwww stinky","smoker",0.75,BadgeType.negative,true),
                 new Badge("Hard breakup :c","Depressed",0.25,BadgeType.negative),
@@ -63,36 +105,35 @@ namespace TatsugotchiWebAPI.Data.Repository {
             _context.SaveChanges();
         }
 
-        public void AddAnimals() {
+        public void AddAnimals()
+        {
             var initBadges = _context.Badges.Where(b => b.IsInit).ToList();
+            var web4User = _petOwners.FirstOrDefault(po => po.Username.Equals("web4"));
+            var testUser = _petOwners.FirstOrDefault(po => po.Username.Equals("test"));
 
             var animals = new Animal[] {
                 new Animal("Emma",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-10),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,web4User),
                 new Animal("Jan",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-10),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,testUser),
                 new Animal("Glenn",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-25),
-                initBadges,false,false,false,0,0),
-                new Animal("Michiel",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-17),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,web4User),
                 new Animal("Rudolf",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-28),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,web4User),
                 new Animal("Sia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-31),
-                initBadges,true,false,false,0,0),
-                new Animal("Shana",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-12),
-                initBadges,false,true,false,0,0),
+                initBadges,true,false,false,0,0,testUser),
                 new Animal("Ria",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-2),
-                initBadges,false,false,false,0,100),
+                initBadges,false,false,false,0,100,testUser),
                 new Animal("Renée",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-20),
-                initBadges,false,false,true,100,0),
+                initBadges,false,false,true,100,0,testUser),
                 new Animal("Tiana",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-40),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,web4User),
                 new Animal("Olivia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-26),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,web4User),
                 new Animal("Mia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-17),
-                initBadges,false,false,false,0,0),
+                initBadges,false,false,false,0,0,web4User),
                 new Animal("Charlotte",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-33),
-                initBadges,false,false,false,0,0)
+                initBadges,false,false,false,0,0,web4User)
             };
 
             _context.Animals.AddRange(animals);
@@ -120,6 +161,30 @@ namespace TatsugotchiWebAPI.Data.Repository {
             }
 
             _context.Eggs.AddRange(eggs);
+            _context.SaveChanges();
+        }
+
+        private void AddSpecialCases() { 
+            var initBadges = _context.Badges.Where(b => b.IsInit).ToList();
+            var testUser = _petOwners.FirstOrDefault(po => po.Username.Equals("test"));
+            var web4User = _petOwners.FirstOrDefault(po => po.Username.Equals("web4"));
+
+            Animal male = new Animal("Bob", AnimalType.Capybara, AnimalGender.Male, DateTime.Now.AddDays(-20),
+                initBadges, false, false, false, 0, 0, testUser);
+
+            Animal female = new Animal("Shana", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-25),
+                initBadges, false, false, false, 0, 0, testUser);
+
+            var egg = female.Breed(male);
+            var an = egg.Hatch();
+            an.Owner = testUser;
+            
+            var egg2 = male.Breed(female);
+            var an2 = egg2.Hatch();
+            an2.Owner = web4User;
+
+            _context.Animals.AddRange(male, female, an,an2);
+
             _context.SaveChanges();
         }
     }

@@ -128,7 +128,7 @@ namespace TatsugotchiWebAPI.Model {
         //ForTesting purposes
         public Animal(string name, AnimalType type, AnimalGender gender, DateTime birthday,
             List<Badge> InitialBadges, bool deceased = false, bool ranAway = false,
-            bool pregnant = false, int hunger = 0, int boredom = 0) {
+            bool pregnant = false, int hunger = 0, int boredom = 0, PetOwner po = null) {
 
             Name = name;
             Type = type;
@@ -142,6 +142,8 @@ namespace TatsugotchiWebAPI.Model {
             Pregnant = pregnant;
             Hunger = hunger;
             Boredom = boredom;
+
+            Owner = po;
         }
         
         private void SharedAttributes(string name) {
