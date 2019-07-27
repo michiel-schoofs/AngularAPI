@@ -115,13 +115,14 @@ namespace TatsugotchiWebAPI.Model {
         }
 
         //Has parents constructor
-        public Animal(string name, AnimalType type,List<Animal> parents) {
+        public Animal(string name, AnimalType type,List<Animal> parents,PetOwner owner) {
             this.parents = parents;
             this.Type = type;
 
             SharedAttributes(name);
             BadgeInheritance();
 
+            this.Owner = owner;
         }
 
         //ForTesting purposes
@@ -216,7 +217,7 @@ namespace TatsugotchiWebAPI.Model {
         } 
 
         //Make breed method
-        public Egg Breed(Animal partner) {
+        public Egg Breed(Animal partner,PetOwner owner,string name) {
             if (partner.Gender == Gender)
                 throw new ArgumentException("You need to have two different genders");
 
@@ -231,7 +232,7 @@ namespace TatsugotchiWebAPI.Model {
 
             female.Pregnant = true;
 
-            var egg = new Egg(female, male);
+            var egg = new Egg(female, male,name,owner);
             return egg;
         }
 

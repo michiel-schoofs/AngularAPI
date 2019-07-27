@@ -17,17 +17,44 @@ namespace TatsugotchiWebAPI.Data.Repository {
         }
 
         //called from multithreaded enviorment
-        public void Delete(Egg egg) {
-            using (ApplicationDBContext context = new ApplicationDBContext()) {
+        public void Delete(Egg egg)
+        {
+            using (ApplicationDBContext context = new ApplicationDBContext())
+            {
                 context.Eggs.Remove(egg);
                 context.SaveChanges();
+
             }
         }
 
+        public ICollection<Egg> GetEggsByPetOwner(PetOwner po){
+            return _eggs.Where(e => e.Owner == po).ToList();
+        }
+
         public IEnumerable<Egg> GetEggsInNeedOfHatching() {
-            return _eggs.Where(e => e.TimeRemaining.Milliseconds <= 0)
-                .Include(e=>e.Mother).ThenInclude(m=> m.AnimalBadges).ThenInclude(ab => ab.Badge)
-                .Include(e => e.Father) .ThenInclude(f => f.AnimalBadges).ThenInclude(ab => ab.Badge).ToList();
+            using (ApplicationDBContext context = new ApplicationDBContext())
+            {
+                return context.Eggs.Where(e => e.TimeRemaining.Milliseconds <= 0)
+                .Include(e => e.AnimalEggs).ThenInclude(ea => ea.An)
+                .ThenInclude(m => m.AnimalBadges).ThenInclude(ab => ab.Badge).ToList();
+            }
+        }
+
+        public Egg GetEggWithID(int ID){
+            return _eggs
+                   .Include(e=>e.Owner)
+                   .Include(e=>e.AnimalEggs)
+                   .FirstOrDefault(e => e.ID == ID) ;
+        }
+
+        public void RemoveEggWithID(int ID){
+            var egg = GetEggWithID(ID);
+
+            if (egg == null){
+                throw new Exception("The egg you're trying to delete could not be found");
+            }
+
+            _eggs.Remove(egg);
         }
 
         public void SaveChanges() {

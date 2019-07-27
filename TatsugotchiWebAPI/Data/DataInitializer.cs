@@ -13,6 +13,12 @@ namespace TatsugotchiWebAPI.Data.Repository {
         private UserManager<IdentityUser> _um;
         private ICollection<PetOwner> _petOwners;
 
+        private static readonly string[] names = new string[]{"Kesha","Morton","Glen","Alease","Ermelinda","Aracelis"
+            ,"Clara","Francesco","Trula","Sonya","Maryland","Minerva","Blanch","Jaimee","Wilton","Salena",
+            "Russel","Josphine","Aimee","Kate","Dominique","Carolyne","Tyrone","Vertie","Natosha",
+            "Sherril","Stanford","Ettie","Estelle","Teofila"};
+        private static readonly Random rand = new Random();
+
         public DataInitializer(ApplicationDBContext context
             ,UserManager<IdentityUser> um) {
             _context = context;
@@ -20,6 +26,11 @@ namespace TatsugotchiWebAPI.Data.Repository {
 
             _um = um;
         }
+
+        private string GetRandomName(){
+            int r = rand.Next(0, names.Length);
+            return names[r];
+        } 
 
         public void Seed() {
             _context.Database.EnsureDeleted();
@@ -146,6 +157,9 @@ namespace TatsugotchiWebAPI.Data.Repository {
             Random rand = new Random();
             List<Egg> eggs = new List<Egg>();
 
+            var testUser = _petOwners.FirstOrDefault(po => po.Username.Equals("test"));
+            var web4User = _petOwners.FirstOrDefault(po => po.Username.Equals("web4"));
+
             var Males = animals.Where(a => a.Gender == AnimalGender.Male && a.CanBreed).ToList();
             var Females = animals.Where(a => a.Gender == AnimalGender.Female && a.CanBreed).ToList();
 
@@ -154,9 +168,9 @@ namespace TatsugotchiWebAPI.Data.Repository {
                 var x = rand.Next(0, 2);
 
                 if (x == 1) {
-                    eggs.Add(fa.Breed(Males[r]));
+                    eggs.Add(fa.Breed(Males[r],testUser,GetRandomName()));
                 }else {
-                    eggs.Add(Males[r].Breed(fa));
+                    eggs.Add(Males[r].Breed(fa,web4User,GetRandomName()));
                 }
             }
 
@@ -175,13 +189,11 @@ namespace TatsugotchiWebAPI.Data.Repository {
             Animal female = new Animal("Shana", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-25),
                 initBadges, false, false, false, 0, 0, testUser);
 
-            var egg = female.Breed(male);
+            var egg = female.Breed(male,testUser,GetRandomName());
             var an = egg.Hatch();
-            an.Owner = testUser;
             
-            var egg2 = male.Breed(female);
+            var egg2 = male.Breed(female,web4User, GetRandomName());
             var an2 = egg2.Hatch();
-            an2.Owner = web4User;
 
             _context.Animals.AddRange(male, female, an,an2);
 

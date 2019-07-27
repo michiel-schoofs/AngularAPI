@@ -7,14 +7,9 @@ using TatsugotchiWebAPI.Model.EFClasses;
 
 namespace TatsugotchiWebAPI.Model {
     public class Egg {
-        private static readonly string[] names = new string[]{"Kesha","Morton","Glen","Alease","Ermelinda","Aracelis"
-            ,"Clara","Francesco","Trula","Sonya","Maryland","Minerva","Blanch","Jaimee","Wilton","Salena",
-            "Russel","Josphine","Aimee","Kate","Dominique","Carolyne","Tyrone","Vertie","Natosha",
-            "Sherril","Stanford","Ettie","Estelle","Teofila"};
-        private static readonly Random rand = new Random();
-
         public int ID { get; set; }
 
+        public string Name { get; set; }
         public List<AnimalEgg> AnimalEggs { get; set; }
         [NotMapped]
         public List<Animal> Parents { get => AnimalEggs.Select(ae =>ae.An).ToList(); }
@@ -22,11 +17,11 @@ namespace TatsugotchiWebAPI.Model {
         public Animal Mother { get => Parents.FirstOrDefault(a => a.Gender == AnimalGender.Female); }
         [NotMapped]
         public Animal Father { get => Parents.FirstOrDefault(a => a.Gender == AnimalGender.Male); }
-
+        
         public DateTime DateConceived { get; set; }
         public AnimalType Type { get; set; }
 
-
+        public PetOwner Owner { get; set; }
 
         [NotMapped]
         public TimeSpan TimeRemaining { get => (DateConceived.Add(Span)).Subtract(DateTime.Now); }
@@ -53,7 +48,7 @@ namespace TatsugotchiWebAPI.Model {
             }
         }
 
-        public Egg(Animal mother,Animal father) {
+        public Egg(Animal mother,Animal father,string name,PetOwner owner) {
             if (mother == null || father == null)
                 throw new ArgumentException("Neither of the parents can be null");
 
@@ -61,6 +56,9 @@ namespace TatsugotchiWebAPI.Model {
 
             AnimalEggs.Add(new AnimalEgg() { An = mother, Egg = this });
             AnimalEggs.Add(new AnimalEgg() { An = father, Egg = this });
+
+            Owner = owner;
+            Name = name;
 
             DateConceived = DateTime.Now;
             Type = Mother.Type;
@@ -70,9 +68,8 @@ namespace TatsugotchiWebAPI.Model {
         protected Egg() {}
 
         public Animal Hatch() {
-            int r = rand.Next(0, names.Count());
             Mother.Pregnant = false;
-            return new Animal(names[r], Type, new List<Animal>() { Mother,Father});
+            return new Animal(Name, Type, new List<Animal>() { Mother,Father},Owner);
         }
 
     }
