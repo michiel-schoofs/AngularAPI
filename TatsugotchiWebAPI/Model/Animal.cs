@@ -23,7 +23,7 @@ namespace TatsugotchiWebAPI.Model {
 
             [Required]
             [StringLength(50, MinimumLength = 3)]
-            public string Name { get; protected set; }
+            public string Name { get; set; }
 
             [Required]
             [Range(1,100)]

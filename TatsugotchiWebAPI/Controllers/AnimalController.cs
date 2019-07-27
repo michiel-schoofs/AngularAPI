@@ -15,7 +15,7 @@ namespace TatsugotchiWebAPI.Controllers
     /// <summary>
     /// Api Controller for everything that has to do with Animals.
     /// </summary>
-    [Route("api/PetOwner/[controller]")]
+    [Route("Api/PetOwner/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AnimalsController:ControllerBase
@@ -34,6 +34,7 @@ namespace TatsugotchiWebAPI.Controllers
             /// <param name="poc">Constructor injection done by Services Providers</param>
             /// <param name="animalRepo">Constructor injection done by Services Providers</param>
             /// <param name="badgeRepository">Constructor injection done by Services Providers</param>
+            /// <param name="eggRepo">Constructor injection done by Services Providers</param>
             public AnimalsController(IPetOwnerRepository poc, IAnimalRepository animalRepo,
                 IBadgeRepository badgeRepository,IEggRepository eggRepo)
             {
@@ -46,16 +47,28 @@ namespace TatsugotchiWebAPI.Controllers
 
         #region Api Functions
             /// <summary>
-            ///     Create an intial animal if you have no animals, otherwise returns an error
-            ///     <seealso cref="AnimalsController.GetAnimal(int)"/>
+            /// Return all the animals owned by the current user
             /// </summary>
-            /// <param name="name">
-            ///     The name of the animal which you are gonna generate
-            /// </param>
-            /// <returns>
-            ///     Returns the path to the newly generated animal
-            /// </returns>
-            [HttpPost("CreateInitialAnimal/{name}")]
+            /// <returns>All the animals owned by the user that's logged in</returns>
+            [HttpGet]
+            public ActionResult<List<AnimalDTO>> GetAllOwnedAnimals()
+            {
+                PetOwner owner = GetUser();
+                ICollection<Animal> animals = owner.Animals;
+                return animals.Select(a => new AnimalDTO(a))
+                              .OrderBy(ad => ad.ID).ToList();
+            }
+            /// <summary>
+            ///     Create an intial animal if you have no animals, otherwise returns an error
+        ///     <seealso cref="AnimalsController.GetAnimal(int)"/>
+        /// </summary>
+        /// <param name="name">
+        ///     The name of the animal which you are gonna generate
+        /// </param>
+        /// <returns>
+        ///     Returns the path to the newly generated animal
+        /// </returns>
+        [HttpPost("Create/{name}")]
             public ActionResult<Animal> CreateInitialAnimal(string name){
                 PetOwner own = GetUser();
 
@@ -81,50 +94,107 @@ namespace TatsugotchiWebAPI.Controllers
             }
 
             /// <summary>
-            /// Set the favorite animal of the user that's logged in,
-            /// This is the animal that's displayed in the angular application
+            /// Get the animal with a specified ID only works if the animal is from the user.
             /// </summary>
-            /// <param name="id">The id of the animal you want to set as a favorite</param>
-            /// <returns>
-            /// Returns the newly favorite animal
-            /// <seealso cref="AnimalsController.GetFavoriteAnimal"/>
-            /// </returns>
-            [HttpPut("SetFavorite/{id}")]
-            public ActionResult SetFavoriteAnimal(int id){
-                PetOwner own = GetUser();
-                Animal animal = _animalRepo.GetAnimal(id);
-
-                if (animal == null)
-                    ModelState.AddModelError("Error", "The animal you specified couldn't be found");
-                else
+            /// <param name="id">The id of the animal you want to view</param>
+            /// <returns>Return a DTO of the animal</returns>
+            [HttpGet("{id}")]
+            public ActionResult<AnimalDTO> GetAnimal(int id)
+            {
+                try
                 {
-                    if (animal.Owner == own)
-                    {
-                        //If user has a favorite then set the favorite to false
-                        if (own.FavoriteAnimal != null)
-                            own.FavoriteAnimal.IsFavorite = false;
-
-                        animal.IsFavorite = true;
-                        _animalRepo.SaveChanges();
-                        return CreatedAtAction(nameof(GetFavoriteAnimal), 
-                                                new AnimalDTO(own.FavoriteAnimal));
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("Error", "You aren't the owner of this animal");
-                    }
+                    Animal an = GetAnimalWithIDAndUser(id, GetUser());
+                    return new AnimalDTO(an);
                 }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
 
-                return BadRequest(ModelState);
-            } 
-            
             /// <summary>
-            /// Gets the favorite animal from the user
+            /// Get the eggs where the animal specified by the id is the parent off
             /// </summary>
-            /// <returns>
-            /// The favorite animal or an error if the user doesn't have a favorite animal
+            /// <param name="id">The id of the animal you want to view the eggs off</param>
+            /// <returns>The eggs that the specified animal has or if the id doesn't correspond to an animal
+            /// Or an animal owned by the user return a bad request.
             /// </returns>
-            [HttpGet("GetFavorite")]
+            [HttpGet("{id}/Eggs")]
+            public ActionResult<ICollection<EggDTO>> GetEggsWithAnimal(int id)
+            {
+                try
+                {
+                    var user = GetUser();
+                    var an = GetAnimalWithIDAndUser(id, user);
+
+                    return _eggRepo.GetEggsFromAnimalOwnedByUser(an, user)
+                                    .Select(e => new EggDTO(e)).ToList();
+
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
+            /// Deletes the specified animal
+            /// </summary>
+            /// <param name="id">The id of the animal you want to delete</param>
+            /// <returns>If the request was succefull (animal is owned by the user and exists) returns an 
+            /// ok and the DTO of the animal. Otherwise return badrequest.
+            /// </returns>
+            [HttpDelete("{id}/Delete")]
+            public ActionResult<AnimalDTO> DeleteAnimal(int id)
+            {
+                try
+                {
+                    Animal an = GetAnimalWithIDAndUser(id, GetUser());
+                    _animalRepo.RemoveAnimal(an);
+                    _animalRepo.SaveChanges();
+                    return Ok(new AnimalDTO(an));
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
+            /// Change the name of the animal.
+            /// </summary>
+            /// <param name="id">The id of the animal you want to change the name of</param>
+            /// <param name="name">The new name of the animal</param>
+            /// <returns>Changes the name of the animal and returns the animal if it's a valid request
+            /// (the specified animal exists and is owned by the user that's logged in). Otherwise returns a bad request.
+            /// </returns>
+            [HttpPatch("{id}/Name/{name}")]
+            public ActionResult<AnimalDTO> ChangeName(int id, string name)
+            {
+                try
+                {
+                    Animal an = GetAnimalWithIDAndUser(id, GetUser());
+                    an.Name = name;
+                    _animalRepo.SaveChanges();
+                    return Ok(new AnimalDTO(an));
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+        /// <summary>
+        /// Gets the favorite animal from the user
+        /// </summary>
+        /// <returns>
+        /// The favorite animal or an error if the user doesn't have a favorite animal
+        /// </returns>
+        [HttpGet("Favorite")]
             public ActionResult<AnimalDTO> GetFavoriteAnimal(){
                 PetOwner own = GetUser();
 
@@ -136,69 +206,59 @@ namespace TatsugotchiWebAPI.Controllers
                 Animal an = own.FavoriteAnimal;
                 return new AnimalDTO(an);
             }
-            
-            /// <summary>
-            /// Get the animal with a specified ID only works if the animal is from the user.
-            /// </summary>
-            /// <param name="id">The id of the animal you want to view</param>
-            /// <returns>Return a DTO of the animal</returns>
-            [HttpGet("GetAnimal/{id}")]
-            public ActionResult<AnimalDTO> GetAnimal(int id) {
+
+        /// <summary>
+        /// Set the favorite animal of the user that's logged in,
+        /// This is the animal that's displayed in the angular application
+        /// </summary>
+        /// <param name="id">The id of the animal you want to set as a favorite</param>
+        /// <returns>
+        /// Returns the newly favorite animal
+        /// <seealso cref="AnimalsController.GetFavoriteAnimal"/>
+        /// </returns>
+        [HttpPut("Favorite/{id}")]
+        public ActionResult SetFavoriteAnimal(int id)
+        {
+            try
+            {
                 PetOwner own = GetUser();
-                Animal an = _animalRepo.GetAnimal(id);
+                Animal animal = GetAnimalWithIDAndUser(id, own);
 
-                if (an != null && an.Owner == own) {
-                    return new AnimalDTO(an);
-                }
+                if (own.FavoriteAnimal != null)
+                    own.FavoriteAnimal.IsFavorite = false;
 
-                if (an == null) 
-                    ModelState.AddModelError("Error Animal", "The animal is not found");
+                animal.IsFavorite = true;
 
-                if (an?.Owner != own) 
-                    ModelState.AddModelError("Error Owner", "You aren't the owner of this animal");
+                _animalRepo.SaveChanges();
+                return CreatedAtAction(nameof(GetFavoriteAnimal),
+                                    new AnimalDTO(own.FavoriteAnimal));
 
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError("Error", e.Message);
                 return BadRequest(ModelState);
             }
-
-            [HttpGet("GetAnimal/{id}/Eggs")]
-            public ActionResult<ICollection<EggDTO>> GetEggsWithAnimal(int id){
-                try{
-                    var an = _animalRepo.GetAnimal(id);
-                    var user = GetUser();
-
-                    if (an == null)
-                        throw new Exception("We couldn't find the animal you're looking for");
-
-                    if (an.Owner != user)
-                        throw new Exception("You aren't the owner of this animal");
-
-                    return _eggRepo.GetEggsFromAnimalOwnedByUser(an, user)
-                                    .Select(e=>new EggDTO(e)).ToList();
-
-                }catch (Exception e){
-                    ModelState.AddModelError("Error",e.Message);
-                    return BadRequest(ModelState);
-                }
-            }
-
-            /// <summary>
-            /// Return all the animals owned by the current user
-            /// </summary>
-            /// <returns>All the animals owned by the user that's logged in</returns>
-            [HttpGet("GetAllOwnedAnimals")]
-            public ActionResult<List<AnimalDTO>> GetAllOwnedAnimals(){
-                PetOwner owner = GetUser();
-                ICollection<Animal> animals = owner.Animals;
-                return animals.Select(a => new AnimalDTO(a))
-                              .OrderBy(ad=>ad.ID).ToList();
-            }
+        }
 
         #endregion
 
         #region Private Helper Functions
-            private PetOwner GetUser(){
+        private PetOwner GetUser(){
                 return _poc.GetByEmail(User.Identity.Name);
-            } 
+            }
+        
+            private Animal GetAnimalWithIDAndUser(int id,PetOwner user){
+                var an = _animalRepo.GetAnimal(id);
+
+                if (an == null)
+                    throw new Exception("We couldn't find the animal you're looking for");
+
+                if (an.Owner != user)
+                    throw new Exception("You aren't the owner of this animal");
+
+                return an;
+            }
         #endregion
     }
 }

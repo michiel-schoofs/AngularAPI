@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using TatsugotchiWebAPI.Model.Enums;
@@ -19,7 +20,9 @@ namespace TatsugotchiWebAPI.Model
         #region Associations
             public Animal Animal { get; set; }
             public int AnimalID { get; set; }
-            public PetOwner Owner { get; set; }
+
+            [NotMapped]
+            public PetOwner Owner { get=>Animal.Owner; }
         #endregion
         
         //EF be retarded
@@ -59,6 +62,17 @@ namespace TatsugotchiWebAPI.Model
 
             AdoptAmount = adoptAmount;
             BreedAmount = breedAmount;
+        }
+
+        public void AcceptAdoption(PetOwner po){
+            if (Owner == po)
+                throw new InvalidListingException("You are the owner of the animal so you can't adopt it");
+
+            if (Owner.WalletAmount < AdoptAmount)
+                throw new InvalidListingException("You don't have enough funds to make this adoption");
+
+            po.WalletAmount -= AdoptAmount;
+            Animal.Owner = po;
         }
     }
 }
