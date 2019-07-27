@@ -54,6 +54,11 @@ namespace TatsugotchiWebAPI.Data.Repository {
             _eggs.Remove(egg);
         }
 
+        public ICollection<Egg> GetEggsFromAnimalOwnedByUser(Animal an,PetOwner po){
+            return _eggs.Include(e => e.AnimalEggs).ThenInclude(ae => ae.An)
+                .Where(e => e.Parents.Contains(an) && e.Owner==po).ToList();
+        }
+
         public void SaveChanges() {
             _context.SaveChanges();
         }

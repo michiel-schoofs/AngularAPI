@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TatsugotchiWebAPI.Model.Enums;
 using TatsugotchiWebAPI.Model.Exceptions;
 
 namespace TatsugotchiWebAPI.Model
@@ -46,6 +47,10 @@ namespace TatsugotchiWebAPI.Model
 
             if (forBreeding == false && forAdoption == false)
                 throw new InvalidListingException("You need to at least list for adoption or for breeding");
+
+            //You can't put up females for breeding otherwise if you close up the account the egg is deleted.
+            if(forBreeding && Animal.Gender == AnimalGender.Female)
+                throw new InvalidListingException("You can't put up females for breeding");
 
             Animal = an;
 

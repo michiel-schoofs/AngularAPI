@@ -217,7 +217,7 @@ namespace TatsugotchiWebAPI.Model {
         } 
 
         //Make breed method
-        public Egg Breed(Animal partner,PetOwner owner,string name) {
+        public Egg Breed(Animal partner,string name) {
             if (partner.Gender == Gender)
                 throw new ArgumentException("You need to have two different genders");
 
@@ -232,7 +232,7 @@ namespace TatsugotchiWebAPI.Model {
 
             female.Pregnant = true;
 
-            var egg = new Egg(female, male,name,owner);
+            var egg = new Egg(female, male,name,female.Owner);
             return egg;
         }
 

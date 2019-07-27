@@ -37,8 +37,12 @@ namespace TatsugotchiWebAPI.Data.Repository {
         }
 
             public ICollection<Animal> GetAllAnimals() {
-                return _animals.Include(a => a.AnimalBadges)
-                .Include(a => a.Owner).ToList();
+                return _animals
+                            .Include(a => a.AnimalBadges)
+                            .Include(a => a.Owner)
+                            .Include(a=>a.AnimalEggs)
+                                .ThenInclude(ae=>ae.Egg)
+                            .ToList();
             }
 
             public Animal GetAnimal(int id) {

@@ -140,11 +140,11 @@ namespace TatsugotchiWebAPI.Data.Repository {
                 new Animal("Tiana",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-40),
                 initBadges,false,false,false,0,0,web4User),
                 new Animal("Olivia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-26),
-                initBadges,false,false,false,0,0,web4User),
+                initBadges,false,false,false,0,0,testUser),
                 new Animal("Mia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-17),
                 initBadges,false,false,false,0,0,web4User),
                 new Animal("Charlotte",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-33),
-                initBadges,false,false,false,0,0,web4User)
+                initBadges,false,false,false,0,0,testUser)
             };
 
             _context.Animals.AddRange(animals);
@@ -168,9 +168,9 @@ namespace TatsugotchiWebAPI.Data.Repository {
                 var x = rand.Next(0, 2);
 
                 if (x == 1) {
-                    eggs.Add(fa.Breed(Males[r],testUser,GetRandomName()));
+                    eggs.Add(fa.Breed(Males[r],GetRandomName()));
                 }else {
-                    eggs.Add(Males[r].Breed(fa,web4User,GetRandomName()));
+                    eggs.Add(Males[r].Breed(fa,GetRandomName()));
                 }
             }
 
@@ -189,10 +189,10 @@ namespace TatsugotchiWebAPI.Data.Repository {
             Animal female = new Animal("Shana", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-25),
                 initBadges, false, false, false, 0, 0, testUser);
 
-            var egg = female.Breed(male,testUser,GetRandomName());
+            var egg = female.Breed(male,GetRandomName());
             var an = egg.Hatch();
             
-            var egg2 = male.Breed(female,web4User, GetRandomName());
+            var egg2 = male.Breed(female, GetRandomName());
             var an2 = egg2.Hatch();
 
             _context.Animals.AddRange(male, female, an,an2);

@@ -49,6 +49,9 @@ namespace TatsugotchiWebAPI.DTO
         public bool CanBreed { get; set; }
 
         [Required]
+        public bool IsPregnant { get; set; }
+
+        [Required]
         public List<BadgeDTO> Badges { get; set; } 
 
         [Required]
@@ -81,6 +84,7 @@ namespace TatsugotchiWebAPI.DTO
                 Badges = animal.Badges.Select(b => new BadgeDTO(b)).ToList();
                 Owner = animal.Owner.Username;
 
+                IsPregnant = animal.Pregnant;
                 Value = animal.AnimalValue;
             } 
         #endregion

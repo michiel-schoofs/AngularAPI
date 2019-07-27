@@ -1,4 +1,5 @@
 ﻿#region Imports
+using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,7 @@ namespace TatsugotchiWebAPI.Controllers
             private readonly IPetOwnerRepository _poc;
             private readonly IAnimalRepository _animalRepo;
             private readonly IBadgeRepository _badgeRepo;
+            private readonly IEggRepository _eggRepo;
         #endregion
 
         #region Constructor
@@ -33,11 +35,12 @@ namespace TatsugotchiWebAPI.Controllers
             /// <param name="animalRepo">Constructor injection done by Services Providers</param>
             /// <param name="badgeRepository">Constructor injection done by Services Providers</param>
             public AnimalsController(IPetOwnerRepository poc, IAnimalRepository animalRepo,
-                IBadgeRepository badgeRepository)
+                IBadgeRepository badgeRepository,IEggRepository eggRepo)
             {
                 _poc = poc;
                 _animalRepo = animalRepo;
                 _badgeRepo = badgeRepository;
+                _eggRepo = eggRepo;
             }
         #endregion
 
@@ -155,6 +158,27 @@ namespace TatsugotchiWebAPI.Controllers
                     ModelState.AddModelError("Error Owner", "You aren't the owner of this animal");
 
                 return BadRequest(ModelState);
+            }
+
+            [HttpGet("GetAnimal/{id}/Eggs")]
+            public ActionResult<ICollection<EggDTO>> GetEggsWithAnimal(int id){
+                try{
+                    var an = _animalRepo.GetAnimal(id);
+                    var user = GetUser();
+
+                    if (an == null)
+                        throw new Exception("We couldn't find the animal you're looking for");
+
+                    if (an.Owner != user)
+                        throw new Exception("You aren't the owner of this animal");
+
+                    return _eggRepo.GetEggsFromAnimalOwnedByUser(an, user)
+                                    .Select(e=>new EggDTO(e)).ToList();
+
+                }catch (Exception e){
+                    ModelState.AddModelError("Error",e.Message);
+                    return BadRequest(ModelState);
+                }
             }
 
             /// <summary>
