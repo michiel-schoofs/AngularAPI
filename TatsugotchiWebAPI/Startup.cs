@@ -150,7 +150,7 @@ namespace TatsugotchiWebAPI {
                 try {
                     dic.Add(obj.Key, Int32.Parse(obj.Value));
                 }
-                catch (Exception e) {
+                catch (Exception) {
                     System.Diagnostics.Debug.WriteLine("Configuration file timers not formated correctly");
                     continue;
                 }

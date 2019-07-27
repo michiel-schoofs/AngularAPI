@@ -43,22 +43,47 @@ namespace TatsugotchiWebAPI.Controllers
         /// an badrequest of this egg doesn't belong to the loged in user</returns>
         [HttpGet("{id}")]
         public ActionResult<EggDTO> GetEggWithID(int id){
-            try
-            {
-                var egg = _eggRepo.GetEggWithID(id);
-
-                if (egg == null)
-                    throw new Exception("We couldn't find the egg you're looking for");
-
-                if (egg.Owner != GetOwner())
-                    throw new Exception("This egg doesn't belong to the user that's logged in");
-
+            try{
+                var egg = GetEgg(id);
                 return new EggDTO(egg);
-            }
-            catch (Exception e) {
+            } catch (Exception e){
                 ModelState.AddModelError("Error", e.Message);
                 return BadRequest(ModelState);
             }
+        }
+
+        /// <summary>
+        /// Deletes the egg with the specified id
+        /// </summary>
+        /// <param name="id">The id of the egg that needs to be deleted</param>
+        /// <returns>
+        /// Bad request if the egg id couldn't be found or the user is not the owner,
+        /// Otherwise return OK + the egg just deleted
+        /// </returns>
+        [HttpDelete("{id}/delete")]
+        public ActionResult<EggDTO> DeleteEggWithID(int id){
+            try{
+                var egg = GetEgg(id);
+                _eggRepo.RemoveEgg(egg);
+                _eggRepo.SaveChanges();
+                return Ok(new EggDTO(egg));
+            }catch (Exception e){
+                ModelState.AddModelError("Error", e.Message);
+                return BadRequest(ModelState);
+            }
+        }
+
+
+        private Egg GetEgg(int id){
+            var egg = _eggRepo.GetEggWithID(id);
+
+            if (egg == null)
+                throw new Exception("We couldn't find the egg you're looking for");
+
+            if (egg.Owner != GetOwner())
+                throw new Exception("This egg doesn't belong to the user that's logged in");
+
+            return egg;
         }
 
         private PetOwner GetOwner(){

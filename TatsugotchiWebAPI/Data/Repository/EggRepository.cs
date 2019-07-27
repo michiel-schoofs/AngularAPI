@@ -44,16 +44,13 @@ namespace TatsugotchiWebAPI.Data.Repository {
             return _eggs
                    .Include(e=>e.Owner)
                    .Include(e=>e.AnimalEggs)
+                        .ThenInclude(ae => ae.An)
+                            .ThenInclude(a=>a.AnimalBadges)
+                                .ThenInclude(ab => ab.Badge)
                    .FirstOrDefault(e => e.ID == ID) ;
         }
 
-        public void RemoveEggWithID(int ID){
-            var egg = GetEggWithID(ID);
-
-            if (egg == null){
-                throw new Exception("The egg you're trying to delete could not be found");
-            }
-
+        public void RemoveEgg(Egg egg){
             _eggs.Remove(egg);
         }
 

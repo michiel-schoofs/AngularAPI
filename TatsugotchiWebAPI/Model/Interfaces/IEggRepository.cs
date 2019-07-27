@@ -6,7 +6,7 @@ namespace TatsugotchiWebAPI.Model.Interfaces {
         void SaveChanges();
         void Delete(Egg egg);
         Egg GetEggWithID(int ID);
-        void RemoveEggWithID(int ID);
+        void RemoveEgg(Egg egg);
         ICollection<Egg> GetEggsByPetOwner(PetOwner po);
     }
 }
