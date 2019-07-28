@@ -24,14 +24,16 @@ namespace TatsugotchiWebAPI.Controllers
             private readonly IPetOwnerRepository _poRepo;
             private readonly IAnimalRepository _aRepo;
             private readonly IListingRepository _listingRepo;
+            private readonly IEggRepository _eggRepo;
         #endregion
 
         #region Constructor
             public ListingsController(IPetOwnerRepository po, IAnimalRepository animalRepo,
-                                       IListingRepository listingRepo){
+                                       IListingRepository listingRepo, IEggRepository eggRepo){
                 _poRepo = po;
                 _aRepo = animalRepo;
                 _listingRepo = listingRepo;
+                _eggRepo = eggRepo;
             }
         #endregion
 
@@ -57,6 +59,37 @@ namespace TatsugotchiWebAPI.Controllers
                 try{
                     var listing = GetListing(id);
                     return new ListingDTO(listing);
+                } catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+
+            /// <summary>
+            /// Breeds with the animal that's put up on the listing
+            /// </summary>
+            /// <param name="id">The id of the listing you want your animal to breed with</param>
+            /// <param name="idOfAnimal">The id of the animal you'll breed with</param>
+            /// <param name="name">The name of the animal that you'll hatch.</param>
+            /// <returns></returns>
+            [HttpPost("{id}/Breed/{idOfAnimal}/{name}")]
+            public ActionResult<EggDTO> BreedAnimalFromListing(int id, int idOfAnimal, string name) {
+                try{
+                    var listing = GetListing(id);
+                    var user = GetOwner();
+                    var animal = _aRepo.GetAnimal(idOfAnimal);
+
+                    if (animal.Owner != user)
+                        throw new Exception("You aren't the owner of the animal you're trying to breed");
+
+                    var egg = listing.AcceptBreeding(user, animal, name);
+                    _eggRepo.AddEgg(egg);
+
+                    _listingRepo.RemoveListing(listing);
+                    _eggRepo.SaveChanges();
+
+                    return Created($"Api/PetOwner/Eggs/{egg.ID}", new EggDTO(egg));
                 } catch (Exception e) {
                     ModelState.AddModelError("Error", e.Message);
                     return BadRequest(ModelState);

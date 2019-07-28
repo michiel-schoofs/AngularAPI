@@ -106,5 +106,24 @@ namespace TatsugotchiWebAPI.Model
 
             Animal.Owner = po;
         }
+
+        public Egg AcceptBreeding(PetOwner po, Animal an, string name)
+        {
+            if (!IsBreedable)
+                throw new InvalidListingException("This animal wasn't put up for breeding");
+
+            if (Owner == po)
+                throw new InvalidListingException("You are the owner of the animal so you can't breed trough a listing");
+
+            if (po.WalletAmount < BreedAmount)
+                throw new InvalidListingException("You don't have enough funds to breed with this animal");
+
+            var egg = an.Breed(Animal, name);
+
+            this.Animal.Owner.WalletAmount += BreedAmount;
+            po.WalletAmount -= BreedAmount;
+
+            return egg;
+        }
     }
 }
