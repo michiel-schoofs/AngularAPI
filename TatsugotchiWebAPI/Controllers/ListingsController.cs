@@ -12,7 +12,7 @@ using TatsugotchiWebAPI.Model.Interfaces;
 #endregion
 
 namespace TatsugotchiWebAPI.Controllers
-{
+{ 
     /// <summary>
     /// Api controller for Listings
     /// </summary>
@@ -36,17 +36,15 @@ namespace TatsugotchiWebAPI.Controllers
         #endregion
 
         #region Api methods
-            /*/// <summary>
-            /// Get the listings of the user that's currently logged in
+            /// <summary>
+            /// Get the listings not by the current logged in user
             /// </summary>
-            /// <returns>The list of Listings made by the logged in user.</returns>
+            /// <returns>Return the data transfer object of those listings</returns>
             [HttpGet]
-            public ActionResult<List<ListingDTO>> GetListings()
-            {
-                var user = GetOwner();
-                ICollection<Listing> listings = user.Listings;
-                return listings.Select(l => new ListingDTO(l)).ToList();
-            }    */
+            public ActionResult<List<ListingDTO>> GetListingByOtherUsers() {
+                var listing = _listingRepo.GetListingsNotByUser(GetOwner());
+                return listing.Select(l => new ListingDTO(l)).ToList();
+            }
 
             /// <summary>
             /// Give the listing with a specific ID
@@ -59,6 +57,20 @@ namespace TatsugotchiWebAPI.Controllers
                 try{
                     var listing = GetListing(id);
                     return new ListingDTO(listing);
+                } catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            [HttpPatch("{id}/Adopt")]
+            public ActionResult<AnimalDTO> AdoptTroughListing(int id){
+                try{
+                    var listing = GetListing(id);
+                    listing.AcceptAdoption(GetOwner());
+                    _listingRepo.RemoveListing(listing);
+                    _listingRepo.SaveChanges();
+                    return Ok(new AnimalDTO(listing.Animal));
                 } catch (Exception e) {
                     ModelState.AddModelError("Error", e.Message);
                     return BadRequest(ModelState);

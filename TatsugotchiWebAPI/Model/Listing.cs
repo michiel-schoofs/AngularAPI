@@ -65,13 +65,18 @@ namespace TatsugotchiWebAPI.Model
         }
 
         public void AcceptAdoption(PetOwner po){
+            if(!IsAdoptable)
+                throw new InvalidListingException("This animal wasn't put up for adoption");
+
             if (Owner == po)
                 throw new InvalidListingException("You are the owner of the animal so you can't adopt it");
 
             if (Owner.WalletAmount < AdoptAmount)
                 throw new InvalidListingException("You don't have enough funds to make this adoption");
 
+            this.Animal.Owner.WalletAmount += AdoptAmount;
             po.WalletAmount -= AdoptAmount;
+
             Animal.Owner = po;
         }
     }

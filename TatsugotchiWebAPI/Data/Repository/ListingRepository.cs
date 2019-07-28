@@ -36,7 +36,9 @@ namespace TatsugotchiWebAPI.Data.Repository
         }
 
         public IEnumerable<Listing> GetListingsNotByUser(PetOwner po){
-            return GetAllListings().Except(GetListingsByUsers(po)).ToList();
+            var listings = _listings.Include(l=>l.Animal).ThenInclude(a=>a.Owner)
+                .Where(l => l.Animal.Owner == po).ToList();
+            return _listings.Include(l=>l.Animal).ThenInclude(a => a.Owner).Except(listings).ToList();
         }
 
         public IEnumerable<Listing> GetListingsWithInvalidAnimals(){
@@ -50,6 +52,9 @@ namespace TatsugotchiWebAPI.Data.Repository
             return _listings
                            .Include(l=>l.Animal)
                                .ThenInclude(l=>l.Owner)
+                            .Include(l=>l.Animal)
+                                .ThenInclude(l=>l.AnimalBadges)
+                                    .ThenInclude(ab=>ab.Badge)
                            .FirstOrDefault(l => l.ID == id);
         }
         
