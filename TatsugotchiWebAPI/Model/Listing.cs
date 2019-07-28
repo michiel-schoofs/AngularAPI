@@ -36,17 +36,13 @@ namespace TatsugotchiWebAPI.Model
         public Listing(Animal an, bool forAdoption, bool forBreeding,
             int adoptAmount,int breedAmount){
 
-            if (adoptAmount < 0 || breedAmount < 0)
-                throw new InvalidListingException("Invalid amount for the listing");
-
             if (!an.CanBreed && forBreeding)
                 throw new InvalidListingException("This animal can't breed");
 
-            if (forAdoption && an.AnimalValue < adoptAmount)
-                throw new InvalidListingException("You can't put it up for adoption more then it's worth");
-
-            if (forBreeding && an.AnimalValue/2 < breedAmount)
-                throw new InvalidListingException("You can't put it up for breeding more then it's half of it's worth");
+            if(forAdoption)
+                CheckAmount(an, adoptAmount,true);
+            if (forBreeding)
+                CheckAmount(an, breedAmount, false);
 
             if (forBreeding == false && forAdoption == false)
                 throw new InvalidListingException("You need to at least list for adoption or for breeding");
@@ -62,6 +58,37 @@ namespace TatsugotchiWebAPI.Model
 
             AdoptAmount = adoptAmount;
             BreedAmount = breedAmount;
+        }
+
+        public void ChangeBreedingAmount(int amount) {
+            if (!IsBreedable)
+                throw new InvalidListingException("This listing isn't for a breeding");
+
+            CheckAmount(Animal, amount,false);
+
+            BreedAmount = amount;
+        }
+
+        public void ChangeAdoptionAmount(int amount){
+            if (!IsAdoptable)
+                throw new InvalidListingException("This listing isn't for an adoption");
+
+            CheckAmount(Animal, amount,true);
+
+            AdoptAmount = amount;
+        }
+
+        private void CheckAmount(Animal an,double amount,bool forAdoption){
+            if (amount <= 0)
+                throw new InvalidListingException("That's an invalid amount");
+
+            if (forAdoption){
+                if (an.AnimalValue < amount)
+                    throw new InvalidListingException("You can't put it up for adoption/breeding more then it's worth");
+            }else {
+                if(an.AnimalValue / 2 < amount)
+                    throw new InvalidListingException("You can't put it up for breeding more then it's half of it's worth");
+            }
         }
 
         public void AcceptAdoption(PetOwner po){

@@ -63,6 +63,12 @@ namespace TatsugotchiWebAPI.Controllers
                 }
             }
 
+            /// <summary>
+            /// Adopt the animal of the specified listing
+            /// </summary>
+            /// <param name="id">The id of the listing you want to adopt the animal for</param>
+            /// <returns>The DTO of the animal you just adopted or
+            /// bad request if the adoption didn't succeed</returns>
             [HttpPatch("{id}/Adopt")]
             public ActionResult<AnimalDTO> AdoptTroughListing(int id){
                 try{
@@ -72,6 +78,56 @@ namespace TatsugotchiWebAPI.Controllers
                     _listingRepo.SaveChanges();
                     return Ok(new AnimalDTO(listing.Animal));
                 } catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
+            /// Updates the breeding amount for the specified listing
+            /// </summary>
+            /// <param name="id">The id of the listing you want to change</param>
+            /// <param name="amount">The new amount for breeding in the listing</param>
+            /// <returns>The changed listing as a dto or if something went wrong a bad request</returns>
+            [HttpPatch("{id}/BreedingAmount/{amount}")]
+            public ActionResult<ListingDTO> ChangeBreedingAmount(int id,int amount){
+                try{
+                    var list = GetListing(id);
+
+                    if (list.Owner != GetOwner())
+                        throw new Exception("You aren't the owner of the listing you're trying to change");
+
+                    list.ChangeBreedingAmount(amount);
+                    _listingRepo.SaveChanges();
+                    return Ok(new ListingDTO(list));
+                } catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
+            /// Updates the adoption amount for the specified listing
+            /// </summary>
+            /// <param name="id">The id of the listing you want to change</param>
+            /// <param name="amount">The new amount for adoption in the listing</param>
+            /// <returns>The changed listing as a dto or if something went wrong a bad request</returns>
+            [HttpPatch("{id}/AdoptionAmount/{amount}")]
+            public ActionResult<ListingDTO> ChangeAdoptionAmount(int id, int amount)
+            {
+                try
+                {
+                    var list = GetListing(id);
+
+                    if (list.Owner != GetOwner())
+                        throw new Exception("You aren't the owner of the listing you're trying to change");
+
+                    list.ChangeAdoptionAmount(amount);
+                    _listingRepo.SaveChanges();
+                    return Ok(new ListingDTO(list));
+                }
+                catch (Exception e)
+                {
                     ModelState.AddModelError("Error", e.Message);
                     return BadRequest(ModelState);
                 }
