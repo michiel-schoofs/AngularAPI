@@ -62,5 +62,9 @@ namespace TatsugotchiWebAPI.Data.Repository {
         public void SaveChanges() {
             _context.SaveChanges();
         }
+
+        public void AddEgg(Egg egg){
+            _eggs.Add(egg);
+        }
     }
 }

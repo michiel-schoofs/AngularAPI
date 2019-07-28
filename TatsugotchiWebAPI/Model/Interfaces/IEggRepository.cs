@@ -2,6 +2,7 @@
 
 namespace TatsugotchiWebAPI.Model.Interfaces {
     public interface IEggRepository {
+        void AddEgg(Egg egg);
         IEnumerable<Egg> GetEggsInNeedOfHatching();
         void SaveChanges();
         void Delete(Egg egg);

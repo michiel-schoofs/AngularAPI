@@ -162,6 +162,33 @@ namespace TatsugotchiWebAPI.Controllers
                     return BadRequest(ModelState);
                 }
             }
+            
+            /// <summary>
+            /// Breeds animals that are owned by the user
+            /// </summary>
+            /// <param name="id">The id of the animal you want to breed</param>
+            /// <param name="idOtherAnimal">The id you want the aforementioned animal to breed with</param>
+            /// <param name="name">The name of the animal that will hatch from the egg</param>
+            /// <returns>Returns a dto of the egg as a result of the breeding process.
+            /// If something went wrong return a bad request with the error.</returns>
+            [HttpPost("{id}/Breed/{idOtherAnimal}/{name}")]
+            public ActionResult<EggDTO> BreedAnimals(int id,int idOtherAnimal,string name){
+                try{
+                    PetOwner user = GetUser();
+
+                    Animal animalOne = GetAnimalWithIDAndUser(id, user);
+                    Animal animalTwo = GetAnimalWithIDAndUser(idOtherAnimal, user);
+                    Egg egg = animalOne.Breed(animalTwo, name);
+
+                    _eggRepo.AddEgg(egg);
+                    _eggRepo.SaveChanges();
+
+                    return Created($"Api/PetOwner/Eggs/{egg.ID}", new EggDTO(egg));
+                 }catch (Exception e) { 
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
 
             /// <summary>
             /// Change the name of the animal.
