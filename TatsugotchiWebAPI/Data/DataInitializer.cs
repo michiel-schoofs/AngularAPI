@@ -5,6 +5,7 @@ using System.Linq;
 using TatsugotchiWebAPI.DTO;
 using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Enums;
+using TatsugotchiWebAPI.Model.Interfaces;
 
 namespace TatsugotchiWebAPI.Data.Repository {
     public class DataInitializer {
@@ -19,11 +20,9 @@ namespace TatsugotchiWebAPI.Data.Repository {
             "Sherril","Stanford","Ettie","Estelle","Teofila"};
         private static readonly Random rand = new Random();
 
-        public DataInitializer(ApplicationDBContext context
-            ,UserManager<IdentityUser> um) {
+        public DataInitializer(ApplicationDBContext context ,UserManager<IdentityUser> um) {
             _context = context;
             _petOwners = new List<PetOwner>();
-
             _um = um;
         }
 
@@ -39,6 +38,7 @@ namespace TatsugotchiWebAPI.Data.Repository {
             AddBadges();
             AddAnimals();
             AddSpecialCases();
+            SetUpBreedingBug();
         }
 
         private void AddUsers(){
@@ -176,6 +176,54 @@ namespace TatsugotchiWebAPI.Data.Repository {
 
             _context.Eggs.AddRange(eggs);
             _context.SaveChanges();
+        }
+
+        private async void SetUpBreedingBug(){
+            var testUser = _petOwners.FirstOrDefault(p => p.Username.Equals("test"));
+
+            var dto = new RegisterDTO()
+            {
+                Email = "bugUser@mail.be",
+                BirthDay = DateTime.Now.AddYears(-24),
+                Password = "string12345",
+                Username = "test"
+            };
+
+            PetOwner po = new PetOwner(dto);
+            _context.PetOwners.Add(po);
+            _um.CreateAsync(new IdentityUser() { UserName = dto.Email, Email = dto.Email }, dto.Password).Wait();
+            _petOwners.Add(po);
+
+            var initBadges = _context.Badges.Where(b => b.IsInit).ToList();
+
+            Animal poAF= new Animal("Tiana", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-40),
+               initBadges, false, false, false, 0, 0, po);
+            Animal poAM = new Animal("Jan", AnimalType.Capybara, AnimalGender.Male, DateTime.Now.AddDays(-10),
+                initBadges, false, false, false, 0, 0, po);
+
+            Animal tuAF = new Animal("Test", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-40),
+               initBadges, false, false, false, 0, 0, testUser);
+            Animal tuAM = new Animal("Jan", AnimalType.Capybara, AnimalGender.Male, DateTime.Now.AddDays(-10),
+                initBadges, false, false, false, 0, 0, testUser);
+
+            var egg1 = poAF.Breed(tuAM,"sdljfsdf");
+            var egg2 = poAM.Breed(tuAF, "sfdmljk");
+
+            _context.Animals.AddRange(new Animal[] { poAF, poAM, tuAF, tuAM });
+            _context.Eggs.AddRange(new Egg[] { egg1, egg2 });
+
+            _context.SaveChanges();
+
+            var eggs = _context.Eggs.Where(e => e.Owner == po).ToList();
+            foreach (var egg in eggs){
+                _context.Eggs.Remove(egg);
+            }
+
+            _context.PetOwners.Remove(po);
+
+            _context.SaveChanges();
+
+            egg2.Hatch();
         }
 
         private void AddSpecialCases() { 
