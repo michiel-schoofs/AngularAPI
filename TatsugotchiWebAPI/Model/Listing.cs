@@ -52,7 +52,7 @@ namespace TatsugotchiWebAPI.Model
                 throw new InvalidListingException("You need to at least list for adoption or for breeding");
 
             //You can't put up females for breeding otherwise if you close up the account the egg is deleted.
-            if(forBreeding && Animal.Gender == AnimalGender.Female)
+            if(forBreeding && an.Gender == AnimalGender.Female)
                 throw new InvalidListingException("You can't put up females for breeding");
 
             Animal = an;

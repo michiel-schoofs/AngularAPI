@@ -174,15 +174,15 @@ namespace TatsugotchiWebAPI.Controllers
             [HttpPatch("{id}/Name/{name}")]
             public ActionResult<AnimalDTO> ChangeName(int id, string name)
             {
-                try
-                {
+                try{
+                    if (string.IsNullOrEmpty(name))
+                        throw new Exception("this is an invalid name");
+
                     Animal an = GetAnimalWithIDAndUser(id, GetUser());
                     an.Name = name;
                     _animalRepo.SaveChanges();
                     return Ok(new AnimalDTO(an));
-                }
-                catch (Exception e)
-                {
+                }catch (Exception e) { 
                     ModelState.AddModelError("Error", e.Message);
                     return BadRequest(ModelState);
                 }

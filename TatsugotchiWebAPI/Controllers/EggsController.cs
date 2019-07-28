@@ -89,6 +89,28 @@ namespace TatsugotchiWebAPI.Controllers
                     return BadRequest(ModelState);
                 }
             }
+
+            /// <summary>
+            /// Changes the name of the animal that will hatch from the egg
+            /// </summary>
+            /// <param name="id">The id of the egg</param>
+            /// <param name="name">The name of the animal that will hatch from the egg</param>
+            /// <returns>A DTO of the egg that you've just changed</returns>
+            [HttpPatch("{id}/Name/{name}")]
+            public ActionResult<EggDTO> ChangeNameOfEggWithID(int id, string name) {
+                try{
+                    if (string.IsNullOrEmpty(name))
+                        throw new Exception("this is an invalid name");
+
+                    Egg egg = GetEgg(id);
+                    egg.Name = name;
+                    _eggRepo.SaveChanges();
+                    return Ok(new EggDTO(egg));
+                }catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
         #endregion
 
         #region Private helper methods

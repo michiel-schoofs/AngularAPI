@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using TatsugotchiWebAPI.Model;
 using TatsugotchiWebAPI.Model.Interfaces;
 

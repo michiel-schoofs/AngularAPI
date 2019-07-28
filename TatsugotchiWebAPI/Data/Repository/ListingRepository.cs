@@ -47,7 +47,10 @@ namespace TatsugotchiWebAPI.Data.Repository
         }
 
         public Listing GetListingWithID(int id){
-            return GetAllListings().FirstOrDefault(l => l.ID == id);
+            return _listings
+                           .Include(l=>l.Animal)
+                               .ThenInclude(l=>l.Owner)
+                           .FirstOrDefault(l => l.ID == id);
         }
         
         public void RemoveListing(Listing li){

@@ -49,6 +49,47 @@ namespace TatsugotchiWebAPI.Controllers
             }    */
 
             /// <summary>
+            /// Give the listing with a specific ID
+            /// </summary>
+            /// <param name="id">The id of the listing you want to view</param>
+            /// <returns>A dto representing the Listing with the ID you specified,
+            /// or a bad request if the listing doesn't exist</returns>
+            [HttpGet("{id}")]
+            public ActionResult<ListingDTO> GetListingWithID(int id){
+                try{
+                    var listing = GetListing(id);
+                    return new ListingDTO(listing);
+                } catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
+            /// Deletes the listing with the specified ID
+            /// </summary>
+            /// <param name="id">The id of the listing you want to delete</param>
+            /// <returns>The deleted listing or badrequest
+            /// if the listing doesn't exist or you aren't the owner</returns>
+            [HttpDelete("{id}/Delete")]
+            public ActionResult<ListingDTO> DeleteListingWithID(int id){
+                try{
+                    Listing listing = GetListing(id);
+
+                    if (listing.Owner != GetOwner())
+                        throw new Exception("You aren't the owner of this listing");
+
+                    _listingRepo.RemoveListing(listing);
+                    _listingRepo.SaveChanges();
+
+                     return Ok(new ListingDTO(listing));
+                } catch(Exception e){
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
             /// Adds a listing made by the user who's logged in
             /// </summary>
             /// <param name="ldto">The DTO corresponding to the listing you wanna make</param>
@@ -81,8 +122,9 @@ namespace TatsugotchiWebAPI.Controllers
                     _listingRepo.AddListing(listing);
                     _listingRepo.SaveChanges();
 
-                    //Gonna be replaced with a path later on to the get function for that listing
-                    return ldto;
+                    var list = _listingRepo.GetListingWithID(listing.ID);
+                    return CreatedAtAction(nameof(GetListingWithID), new { id = listing.ID }
+                                            , new ListingDTO(list));
                 }catch (Exception e){
                     ModelState.AddModelError("Error", e.Message);
                     return BadRequest(ModelState);
@@ -91,9 +133,18 @@ namespace TatsugotchiWebAPI.Controllers
         #endregion
 
         #region Helper functions
-        private PetOwner GetOwner(){
+            private PetOwner GetOwner(){
                 return _poRepo.GetByEmail(User.Identity.Name);
             } 
+
+            private Listing GetListing(int id){
+                var listing = _listingRepo.GetListingWithID(id);
+
+                if (listing == null)
+                    throw new Exception("This listing doesn't exist");
+
+                return listing;
+            }
         #endregion
     }
 }

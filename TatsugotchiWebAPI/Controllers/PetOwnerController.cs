@@ -26,16 +26,19 @@ namespace TatsugotchiWebAPI.Controllers
             private readonly IPetOwnerRepository _poRepo;
             private readonly IImageRepository _imageRepo;
             private readonly IListingRepository _listingRepo;
+            private readonly IEggRepository _eggRepo;
             private readonly IConfiguration _config;
             private readonly UserManager<IdentityUser> _um;
         #endregion
 
         #region Constructor
-            public PetOwnerController(IPetOwnerRepository repo, IConfiguration config
-                  ,IImageRepository imageRepo,IListingRepository liRepo, UserManager<IdentityUser> um){
+        public PetOwnerController(IPetOwnerRepository repo, IConfiguration config
+                                 , IImageRepository imageRepo, IListingRepository liRepo, IEggRepository eggRepo,
+                                  UserManager<IdentityUser> um){
                 _poRepo = repo;
                 _config = config;
                 _imageRepo = imageRepo;
+                _eggRepo = eggRepo;
                 _listingRepo = liRepo;
                 _um = um;
             }
@@ -62,6 +65,20 @@ namespace TatsugotchiWebAPI.Controllers
             {
                 PetOwner po = GetOwner();
 
+                var eggs = _eggRepo.GetEggsByPetOwner(po);
+                foreach(var egg in eggs){
+                    _eggRepo.RemoveEgg(egg);
+                }
+
+                var listings = _listingRepo.GetListingsByUsers(po);
+                foreach(var list in listings){
+                    _listingRepo.RemoveListing(list);
+                }
+
+                if(po.HasImage)
+                    _imageRepo.RemoveImage(po.Image);
+
+                _poRepo.SaveChanges();
                 _poRepo.RemovePO(po);
 
                 var user = await _um.FindByEmailAsync(po.Email);
