@@ -124,33 +124,38 @@ namespace TatsugotchiWebAPI.Data.Repository {
 
             var animals = new Animal[] {
                 new Animal("Emma",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-10),
-                initBadges,false,false,false,0,0,web4User),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),web4User),
                 new Animal("Jan",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-10),
-                initBadges,false,false,false,0,0,testUser),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),testUser),
                 new Animal("Glenn",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-25),
-                initBadges,false,false,false,0,0,web4User),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),web4User),
                 new Animal("Rudolf",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-28),
-                initBadges,false,false,false,0,0,web4User),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),web4User),
                 new Animal("Sia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-31),
-                initBadges,true,false,false,0,0,testUser),
+                initBadges,true,false,false,0,0,GetRandomStat(),GetRandomStat(),testUser),
                 new Animal("Ria",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-2),
-                initBadges,false,false,false,0,100,testUser),
+                initBadges,false,false,false,0,100,GetRandomStat(),GetRandomStat(),testUser),
                 new Animal("Renée",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-20),
-                initBadges,false,false,true,100,0,testUser),
+                initBadges,false,false,true,100,0,GetRandomStat(),GetRandomStat(),testUser),
                 new Animal("Tiana",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-40),
-                initBadges,false,false,false,0,0,web4User),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),web4User),
                 new Animal("Olivia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-26),
-                initBadges,false,false,false,0,0,testUser),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),testUser),
                 new Animal("Mia",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-17),
-                initBadges,false,false,false,0,0,web4User),
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),web4User),
                 new Animal("Charlotte",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-33),
-                initBadges,false,false,false,0,0,testUser)
+                initBadges,false,false,false,0,0,GetRandomStat(),GetRandomStat(),testUser)
             };
 
             _context.Animals.AddRange(animals);
             _context.SaveChanges();
 
             Breed(animals);
+        }
+
+        private int GetRandomStat(){
+            Random rand = new Random();
+            return rand.Next(1, 101);
         }
 
         public void Breed(Animal[] animals) {
@@ -197,14 +202,14 @@ namespace TatsugotchiWebAPI.Data.Repository {
             var initBadges = _context.Badges.Where(b => b.IsInit).ToList();
 
             Animal poAF= new Animal("Tiana", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-40),
-               initBadges, false, false, false, 0, 0, po);
+               initBadges, false, false, false, 0, 0, GetRandomStat(), GetRandomStat(), po);
             Animal poAM = new Animal("Jan", AnimalType.Capybara, AnimalGender.Male, DateTime.Now.AddDays(-10),
-                initBadges, false, false, false, 0, 0, po);
+                initBadges, false, false, false, 0, 0, GetRandomStat(), GetRandomStat(), po);
 
             Animal tuAF = new Animal("Test", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-40),
-               initBadges, false, false, false, 0, 0, testUser);
+               initBadges, false, false, false, 0, 0, GetRandomStat(), GetRandomStat(), testUser);
             Animal tuAM = new Animal("Jan", AnimalType.Capybara, AnimalGender.Male, DateTime.Now.AddDays(-10),
-                initBadges, false, false, false, 0, 0, testUser);
+                initBadges, false, false, false, 0, 0, GetRandomStat(), GetRandomStat(), testUser);
 
             var egg1 = poAF.Breed(tuAM,"sdljfsdf");
             var egg2 = poAM.Breed(tuAF, "sfdmljk");
@@ -223,7 +228,10 @@ namespace TatsugotchiWebAPI.Data.Repository {
 
             _context.SaveChanges();
 
-            egg2.Hatch();
+            Animal an = egg2.Hatch();
+            _context.Animals.Add(an);
+            _context.Eggs.Remove(egg2);
+            _context.SaveChanges();
         }
 
         private void AddSpecialCases() { 
@@ -232,10 +240,10 @@ namespace TatsugotchiWebAPI.Data.Repository {
             var web4User = _petOwners.FirstOrDefault(po => po.Username.Equals("web4"));
 
             Animal male = new Animal("Bob", AnimalType.Capybara, AnimalGender.Male, DateTime.Now.AddDays(-20),
-                initBadges, false, false, false, 0, 0, testUser);
+                initBadges, false, false, false, 0, 0, GetRandomStat(), GetRandomStat(), testUser);
 
             Animal female = new Animal("Shana", AnimalType.Capybara, AnimalGender.Female, DateTime.Now.AddDays(-25),
-                initBadges, false, false, false, 0, 0, testUser);
+                initBadges, false, false, false, 0, 0, GetRandomStat(), GetRandomStat(), testUser);
 
             var egg = female.Breed(male,GetRandomName());
             var an = egg.Hatch();

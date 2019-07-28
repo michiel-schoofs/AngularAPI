@@ -128,7 +128,7 @@ namespace TatsugotchiWebAPI.Model {
         //ForTesting purposes
         public Animal(string name, AnimalType type, AnimalGender gender, DateTime birthday,
             List<Badge> InitialBadges, bool deceased = false, bool ranAway = false,
-            bool pregnant = false, int hunger = 0, int boredom = 0, PetOwner po = null) {
+            bool pregnant = false, int hunger = 0, int boredom = 0,int speed=0,int charisma=0, PetOwner po = null) {
 
             AnimalEggs = new List<AnimalEgg>();
             Name = name;
@@ -143,6 +143,9 @@ namespace TatsugotchiWebAPI.Model {
             Pregnant = pregnant;
             Hunger = hunger;
             Boredom = boredom;
+
+            Speed = speed;
+            Charisma = charisma;
 
             Owner = po;
         }
@@ -176,10 +179,22 @@ namespace TatsugotchiWebAPI.Model {
         #region Methods
         private void BadgeInheritance(List<Badge> init = null) {
             if (parents != null) {
-                AnimalBadges = parents.SelectMany(a => a.Badges)
-                    .ToHashSet().Where(b => b.CalculateInherit() == true)
-                    .Select(b=>new AnimalBadges(b,this))
-                    .ToList();
+
+
+                if (parents.Contains(null))
+                {
+                    Animal nonGlitched = parents.FirstOrDefault(a => a != null);
+                    AnimalBadges = nonGlitched.Badges
+                                    .ToHashSet().Where(b => b.CalculateInherit() == true)
+                                    .Select(b => new AnimalBadges(b, this))
+                                    .ToList();
+
+                }else{
+                    AnimalBadges = parents.SelectMany(a => a.Badges)
+                        .ToHashSet().Where(b => b.CalculateInherit() == true)
+                        .Select(b => new AnimalBadges(b, this))
+                        .ToList();
+                }
 
                 //if there are no badges after random seed take the first
                 if (Badges.Count == 0)
@@ -211,8 +226,15 @@ namespace TatsugotchiWebAPI.Model {
                 if (parents.Count != 2)
                     throw new ArgumentException("You can't have less or more then two parents");
 
-                Speed = (int)parents.Average(a => a.Speed);
-                Charisma = (int)parents.Average(a => a.Charisma);
+                //Encountered glitch aka user of one of the parents is deleted
+                if (parents.Contains(null)){
+                    Animal nonGlitched = parents.FirstOrDefault(a => a != null);
+                    Speed = nonGlitched.Speed;
+                    Charisma = nonGlitched.Charisma;
+                } else{
+                    Speed = (int)parents.Average(a => a.Speed);
+                    Charisma = (int)parents.Average(a => a.Charisma);
+                }
             }
         } 
 
