@@ -47,6 +47,7 @@ namespace TatsugotchiWebAPI {
                 .AddScoped<IBadgeRepository, BadgeRepository>()
                 .AddScoped<IEggRepository, EggRepository>()
                 .AddScoped<IPetOwnerRepository, PetOwnerRepository>()
+                .AddScoped<IListingRepository, ListingRepository>()
                 .AddScoped<IImageRepository,ImageRepository>();
 
             services.AddOpenApiDocument(d=> {

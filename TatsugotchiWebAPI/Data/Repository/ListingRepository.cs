@@ -20,13 +20,19 @@ namespace TatsugotchiWebAPI.Data.Repository
             _listings.Add(li);
         }
 
+        public bool AnimalIsInListing(Animal an){
+            return GetAllListings().Select(li => li.Animal).Contains(an);
+        }
+
         public IEnumerable<Listing> GetAllListings(){
             return _listings.Include(l=>l.Animal).ToList();
         }
 
         public IEnumerable<Listing> GetListingsByUsers(PetOwner po){
-            return _listings.Include(l => l.Animal)
-                .Where(l => l.Owner==po).ToList();
+            return _listings
+                .Include(l => l.Animal)
+                .ThenInclude(a=>a.Owner)
+                .Where(l => l.Animal.Owner==po).ToList();
         }
 
         public IEnumerable<Listing> GetListingsNotByUser(PetOwner po){

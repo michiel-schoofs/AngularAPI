@@ -19,7 +19,7 @@ namespace TatsugotchiWebAPI.Controllers
     /// <summary>
     /// Api to register and login a user.
     /// </summary>
-    [Route("api/[Controller]")]
+    [Route("Api/[Controller]")]
     [ApiController]
     public class UsersController:ControllerBase
     {
@@ -48,7 +48,7 @@ namespace TatsugotchiWebAPI.Controllers
             /// <param name="loginDTO">The dto containing the username and the password used for logging in</param>
             /// <returns>A cookie used to identify the user.</returns>
             [AllowAnonymous]
-            [HttpPost("login")]
+            [HttpPost("Login")]
             public async Task<ActionResult<string>> Login(LoginDTO loginDTO)
             {
                 var user = await UM.FindByNameAsync(loginDTO.Email);
@@ -85,7 +85,7 @@ namespace TatsugotchiWebAPI.Controllers
             /// <param name="registerDTO">A dto containing all the information needed to identify a user.</param>
             /// <returns>A cookie that's passed to the frontend to identify the user.</returns>
             [AllowAnonymous]
-            [HttpPost("register")]
+            [HttpPost("Register")]
             public async Task<ActionResult<string>> Register(RegisterDTO registerDTO)
             {
                 if (POR.EmailExists(registerDTO.Email))

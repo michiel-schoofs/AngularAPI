@@ -3,6 +3,7 @@
 namespace TatsugotchiWebAPI.Model.Interfaces
 {
     public interface IListingRepository{
+        bool AnimalIsInListing(Animal an);
         IEnumerable<Listing> GetListingsWithInvalidAnimals();
         IEnumerable<Listing> GetAllListings();
         IEnumerable<Listing> GetListingsByUsers(PetOwner po);

@@ -19,11 +19,6 @@ namespace TatsugotchiWebAPI.Data.Mapping
                    .HasForeignKey<Listing>(l=>l.AnimalID)
                    .IsRequired(true)
                    .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(l => l.Owner)
-                   .WithMany(o => o.Listings)
-                   .IsRequired()
-                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

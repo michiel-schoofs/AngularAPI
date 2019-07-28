@@ -16,7 +16,7 @@ namespace TatsugotchiWebAPI.Controllers
     /// Everything to do with eggs
     /// </summary>
     [ApiController]
-    [Route("api/PetOwner/[Controller]")]
+    [Route("Api/PetOwner/[Controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class EggsController : ControllerBase {
         #region Fields
@@ -33,11 +33,11 @@ namespace TatsugotchiWebAPI.Controllers
         #endregion
 
         #region API Methods
-        /// <summary>
+            /// <summary>
         /// Return the eggs owned by the current user
         /// </summary>
         /// <returns>The eggs owned by the user loged in otherwise return null</returns>
-        [HttpGet]
+            [HttpGet]
             public ActionResult<List<EggDTO>> GetEggsByUser()
             {
                 var eggs = _eggRepo.GetEggsByPetOwner(GetOwner());
@@ -73,7 +73,7 @@ namespace TatsugotchiWebAPI.Controllers
             /// Bad request if the egg id couldn't be found or the user is not the owner,
             /// Otherwise return OK + the egg just deleted
             /// </returns>
-            [HttpDelete("{id}/delete")]
+            [HttpDelete("{id}/Delete")]
             public ActionResult<EggDTO> DeleteEggWithID(int id)
             {
                 try
