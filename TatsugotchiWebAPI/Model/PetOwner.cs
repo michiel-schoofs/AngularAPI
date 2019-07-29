@@ -73,6 +73,19 @@ namespace TatsugotchiWebAPI.Model
                 RemoveItem(item, 1);
             }
 
+            public bool ContainsItem(Item item){
+                return Inventory.Contains(item);
+            }
+            
+            public int GetQuantity(Item item){
+                var poi = POI.FirstOrDefault(p => p.Item == item);
+
+                if (poi == null)
+                    return 0;
+                else
+                    return poi.Quantity;
+            }
+
             public void RemoveItem(Item item, int quantity)
             {
                 var poi = POI.FirstOrDefault(p => p.Item == item);

@@ -9,6 +9,7 @@ using TatsugotchiWebAPI.Model.Enums;
 namespace TatsugotchiWebAPI.DTO
 {
     public class ItemDTO{
+        public int ID { get; set; }
         public int MoneyVal { get; set; }
         public string Name { get; set; }
         public int Value { get; set; }
@@ -21,6 +22,7 @@ namespace TatsugotchiWebAPI.DTO
             Name = item.Item.Name;
             Value = item.Item.Value;
             URL = item.Item.URL;
+            ID = item.Item.ID;
 
             Quantity = item.Quantity;
             CategoryEnum = Enum.GetName(typeof(ItemCategory), item.Item.Category);

@@ -187,10 +187,11 @@ namespace TatsugotchiWebAPI.Controllers
                 var user = GetOwner();
                 return user.POI.Select(poi => new ItemDTO(poi)).ToList();
             }
+
         #endregion
 
         #region Private methods
-            private PetOwner GetOwner(){
+        private PetOwner GetOwner(){
                 return _poRepo.GetByEmail(User.Identity.Name);
             } 
         #endregion

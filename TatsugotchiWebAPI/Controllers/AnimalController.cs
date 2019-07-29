@@ -25,6 +25,7 @@ namespace TatsugotchiWebAPI.Controllers
             private readonly IAnimalRepository _animalRepo;
             private readonly IBadgeRepository _badgeRepo;
             private readonly IEggRepository _eggRepo;
+            private readonly IItemRepository _itemRepo;
         #endregion
 
         #region Constructor
@@ -36,12 +37,13 @@ namespace TatsugotchiWebAPI.Controllers
             /// <param name="badgeRepository">Constructor injection done by Services Providers</param>
             /// <param name="eggRepo">Constructor injection done by Services Providers</param>
             public AnimalsController(IPetOwnerRepository poc, IAnimalRepository animalRepo,
-                IBadgeRepository badgeRepository,IEggRepository eggRepo)
+                IBadgeRepository badgeRepository,IEggRepository eggRepo,IItemRepository itemRepo)
             {
                 _poc = poc;
                 _animalRepo = animalRepo;
                 _badgeRepo = badgeRepository;
                 _eggRepo = eggRepo;
+                _itemRepo = itemRepo;
             }
         #endregion
 
@@ -191,14 +193,68 @@ namespace TatsugotchiWebAPI.Controllers
             }
 
             /// <summary>
-            /// Change the name of the animal.
+            /// Feeds the animal with the specified id, the specified item
             /// </summary>
-            /// <param name="id">The id of the animal you want to change the name of</param>
-            /// <param name="name">The new name of the animal</param>
-            /// <returns>Changes the name of the animal and returns the animal if it's a valid request
-            /// (the specified animal exists and is owned by the user that's logged in). Otherwise returns a bad request.
-            /// </returns>
-            [HttpPatch("{id}/Name/{name}")]
+            /// <param name="id">the id of the animal you want to feed</param>
+            /// <param name="itemID">the id of the item you want to feed to the animal</param>
+            /// <returns>If it was succesfull return the AnimalDTO else return bad request</returns>
+            [HttpPut("{id}/Feed/{itemID}")]
+            public ActionResult<AnimalDTO> Feed(int id, int itemID){
+                try{
+                    PetOwner user = GetUser();
+                    Animal animal = GetAnimalWithIDAndUser(id, user);
+
+                    Item item = GetItemWithId(itemID);
+                    CheckItemInventory(user, item, 1);
+
+                    animal.FeedAnimal(item);
+                    user.RemoveItem(item);
+                    _animalRepo.SaveChanges();
+                    return Ok(new AnimalDTO(animal));
+                }catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+            /// <summary>
+            /// entertain the animal with the specified id, the specified item
+            /// </summary>
+            /// <param name="id">the id of the animal you want to entertain</param>
+            /// <param name="itemID">the id of the item you want to entertain to the animal</param>
+            /// <returns>If it was succesfull return the AnimalDTO else return bad request</returns>
+            [HttpPut("{id}/Entertain/{itemID}")]
+            public ActionResult<AnimalDTO> Entertain(int id, int itemID)
+            {
+                try
+                {
+                    PetOwner user = GetUser();
+                    Animal animal = GetAnimalWithIDAndUser(id, user);
+
+                    Item item = GetItemWithId(itemID);
+                    CheckItemInventory(user, item, 1);
+
+                    animal.EntertainAnimal(item);
+                    user.RemoveItem(item);
+                    _animalRepo.SaveChanges();
+                    return Ok(new AnimalDTO(animal));
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
+            }
+
+        /// <summary>
+        /// Change the name of the animal.
+        /// </summary>
+        /// <param name="id">The id of the animal you want to change the name of</param>
+        /// <param name="name">The new name of the animal</param>
+        /// <returns>Changes the name of the animal and returns the animal if it's a valid request
+        /// (the specified animal exists and is owned by the user that's logged in). Otherwise returns a bad request.
+        /// </returns>
+        [HttpPatch("{id}/Name/{name}")]
             public ActionResult<AnimalDTO> ChangeName(int id, string name)
             {
                 try{
@@ -271,8 +327,25 @@ namespace TatsugotchiWebAPI.Controllers
         #endregion
 
         #region Private Helper Functions
-        private PetOwner GetUser(){
+            private PetOwner GetUser(){
                 return _poc.GetByEmail(User.Identity.Name);
+            }
+
+            private Item GetItemWithId(int id){
+                var item = _itemRepo.GetItem(id);
+
+                if (item == null)
+                    throw new Exception("This item doesn't exist");
+
+                return item;
+            }
+
+            private void CheckItemInventory(PetOwner po, Item item,int quantity){
+                if (!po.ContainsItem(item))
+                    throw new Exception("You don't have that item in your inventory");
+
+                if (po.GetQuantity(item) < quantity)
+                    throw new Exception("you don't have enough of this item");
             }
         
             private Animal GetAnimalWithIDAndUser(int id,PetOwner user){

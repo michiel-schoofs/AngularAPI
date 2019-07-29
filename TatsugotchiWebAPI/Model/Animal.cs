@@ -283,6 +283,26 @@ namespace TatsugotchiWebAPI.Model {
             IsDeceased = (r <= (StarveChance * 10));
         }
 
+        public void FeedAnimal(Item item){
+            if (item.Category != ItemCategory.Food)
+                throw new Exception("This ain't edible homie");
+
+            if (item.Value > Hunger)
+                Hunger = 0;
+            else
+                Hunger -= item.Value;
+        }
+
+        public void EntertainAnimal(Item item){
+            if (item.Category != ItemCategory.Entertainment)
+                throw new Exception("This isn't entertaining now is it");
+
+            if (item.Value > Boredom)
+                Boredom = 0;
+            else
+                Boredom -= item.Value;
+        }
+
         private void RunChanceRoll() {
             int r = rand.Next(0, 1001);
             RanAway = (r <= (RunAwayChance * 10));
