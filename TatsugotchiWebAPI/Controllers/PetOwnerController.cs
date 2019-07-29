@@ -183,9 +183,9 @@ namespace TatsugotchiWebAPI.Controllers
             /// </summary>
             /// <returns>The items of the currently logged in user</returns>
             [HttpGet("Inventory")]
-            public ActionResult<List<ItemDTO>> GetInventory(){
+            public ActionResult<List<POItemDTO>> GetInventory(){
                 var user = GetOwner();
-                return user.POI.Select(poi => new ItemDTO(poi)).ToList();
+                return user.POI.Select(poi => new POItemDTO(poi)).ToList();
             }
 
         #endregion

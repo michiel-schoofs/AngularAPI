@@ -12,6 +12,7 @@ namespace TatsugotchiWebAPI.Data.Repository {
         private ApplicationDBContext _context { get; set; }
         private UserManager<IdentityUser> _um;
         private ICollection<PetOwner> _petOwners;
+        private Item[] items;
 
         private static readonly string[] names = new string[]{"Kesha","Morton","Glen","Alease","Ermelinda","Aracelis"
             ,"Clara","Francesco","Trula","Sonya","Maryland","Minerva","Blanch","Jaimee","Wilton","Salena",
@@ -39,6 +40,18 @@ namespace TatsugotchiWebAPI.Data.Repository {
             AddSpecialCases();
             SetUpBreedingBug();
             AddItems();
+            SeedMarket();
+        }
+
+        private void SeedMarket(){
+            var market = Market.GetMarket();
+
+            foreach (Item it in items) {
+                market.AddListing(new MarketListing(it, 100));
+            }
+
+            _context.Market.Add(market);
+            _context.SaveChanges();
         }
 
         private void AddUsers(){
@@ -177,7 +190,7 @@ namespace TatsugotchiWebAPI.Data.Repository {
             Item lasgna = new Item(29, 30, ItemCategory.Food, "sdfsqdf", "Lasagna");
             var tuna = new Item(80, 100, ItemCategory.Food, "sdfsqdf", "Canned tuna");
 
-            Item[] items = new Item[] {
+            items = new Item[] {
                 new Item(100,10,ItemCategory.Entertainment,"sdfsqdf","TV"),
                 pizzaHawai,
                 ninSwitch,

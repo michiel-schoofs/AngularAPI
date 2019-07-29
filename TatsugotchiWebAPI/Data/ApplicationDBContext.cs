@@ -16,6 +16,7 @@ namespace TatsugotchiWebAPI.Data {
         public DbSet<Listing> Listings { get; set; }
         public DbSet<PetOwner> PetOwners { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Market> Market { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseSqlServer("Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;");
