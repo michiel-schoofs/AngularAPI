@@ -15,6 +15,7 @@ namespace TatsugotchiWebAPI.Model
             public string Username { get; set; }
             public string Email { get; set; }
             public DateTime BirthDay { get; set; }
+            public DateTime RedeemedMoney { get; set; }
         #endregion
 
         #region Associations
@@ -32,6 +33,7 @@ namespace TatsugotchiWebAPI.Model
                 Username = rdto.Username;
                 Animals = new List<Animal>();
                 WalletAmount = 2000;
+                RedeemedMoney = DateTime.Now.AddDays(-1);
             }
 
             //EF Constructor

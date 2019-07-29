@@ -15,6 +15,7 @@ using System.Collections.Generic;
 
 namespace TatsugotchiWebAPI.Controllers
 {
+    //Api/PetOwner/Wallet/Daily/Red
     /// <summary>
     /// Everything to do with pet owners
     /// </summary>
@@ -29,6 +30,7 @@ namespace TatsugotchiWebAPI.Controllers
             private readonly IEggRepository _eggRepo;
             private readonly IConfiguration _config;
             private readonly UserManager<IdentityUser> _um;
+            private readonly static int DailyRedeemAmount = 80;
         #endregion
 
         #region Constructor
@@ -130,6 +132,50 @@ namespace TatsugotchiWebAPI.Controllers
                 user.Image = img;
                 _poRepo.SaveChanges();
                 return CreatedAtAction(nameof(GetImage), imageDTO);
+            }
+
+            /// <summary>
+            /// Get the current logged in user information
+            /// </summary>
+            /// <returns>Returns a petowner dto based on the current logged in user</returns>
+            [HttpGet]
+            public ActionResult<PetOwnerDTO> GetUser() {
+                var user = GetOwner();
+                return new PetOwnerDTO(user);
+            }
+
+            /// <summary>
+            /// Return the wallet amount of the currently logged in user
+            /// </summary>
+            /// <returns>the wallet amount of the currently logged in user</returns>
+            [HttpGet("Wallet")]
+            public ActionResult<object> ViewWalletAmount(){
+                var user = GetOwner();
+                return new { wallet = user.WalletAmount };
+            }
+
+            /// <summary>
+            /// Redeem the daily amount of money if the user hasn't redeemd it yet. Otherwise return a bad request.
+            /// </summary>
+            /// <returns>Returns the petowner dto of the currently logged in user.</returns>
+            [HttpPut("Wallet/Daily/Redeem")]
+            public ActionResult<PetOwnerDTO> RedeemDailyAmount(){
+                try{
+                    var user = GetOwner();
+
+                    if( DateTime.Now.Subtract(user.RedeemedMoney).TotalDays < 1)
+                        throw new Exception("You already redeemed your daily money amount");
+
+                    user.WalletAmount += DailyRedeemAmount;
+                    user.RedeemedMoney = DateTime.Now;
+
+                    _poRepo.SaveChanges();
+
+                    return Ok(new PetOwnerDTO(user));
+                } catch (Exception e) {
+                    ModelState.AddModelError("Error", e.Message);
+                    return BadRequest(ModelState);
+                }
             }
         #endregion
 
