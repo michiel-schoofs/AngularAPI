@@ -39,6 +39,7 @@ namespace TatsugotchiWebAPI.Data.Repository {
             AddAnimals();
             AddSpecialCases();
             SetUpBreedingBug();
+            AddItems();
         }
 
         private void AddUsers(){
@@ -156,6 +157,37 @@ namespace TatsugotchiWebAPI.Data.Repository {
         private int GetRandomStat(){
             Random rand = new Random();
             return rand.Next(1, 101);
+        }
+
+        private void AddItems() {
+            var testUser = _petOwners.FirstOrDefault(po => po.Username.Equals("test"));
+
+            var pizzaHawai = new Item(20, 40, ItemCategory.Food, "sdfsqdf", "Pizza Hawaii");
+            Item ninSwitch = new Item(60, 25, ItemCategory.Entertainment, "sdfsqdf", "Nintendo Switch");
+            Item lasgna = new Item(29, 30, ItemCategory.Food, "sdfsqdf", "Lasagna");
+            var tuna = new Item(80, 100, ItemCategory.Food, "sdfsqdf", "Canned tuna");
+
+            Item[] items = new Item[] {
+                new Item(100,10,ItemCategory.Entertainment,"sdfsqdf","TV"),
+                pizzaHawai,
+                ninSwitch,
+                lasgna,
+                tuna
+            };
+
+            _context.Items.AddRange(items);
+
+            testUser.AddItem(pizzaHawai);
+            testUser.AddItem(ninSwitch, 10);
+
+            testUser.AddItem(tuna, 15);
+            testUser.RemoveItem(tuna);
+            testUser.RemoveItem(tuna,4);
+
+            testUser.AddItem(lasgna, 10);
+            testUser.RemoveItem(lasgna,10);
+
+            _context.SaveChanges();
         }
 
         public void Breed(Animal[] animals) {

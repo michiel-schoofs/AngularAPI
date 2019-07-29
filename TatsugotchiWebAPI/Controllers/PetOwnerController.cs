@@ -177,6 +177,16 @@ namespace TatsugotchiWebAPI.Controllers
                     return BadRequest(ModelState);
                 }
             }
+
+            /// <summary>
+            /// Get the items in the inventory of the currently logged in user
+            /// </summary>
+            /// <returns>The items of the currently logged in user</returns>
+            [HttpGet("Inventory")]
+            public ActionResult<List<ItemDTO>> GetInventory(){
+                var user = GetOwner();
+                return user.POI.Select(poi => new ItemDTO(poi)).ToList();
+            }
         #endregion
 
         #region Private methods

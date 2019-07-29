@@ -12,6 +12,7 @@ namespace TatsugotchiWebAPI.Data {
         public DbSet<Animal> Animals { get; set; }
         public DbSet<Badge> Badges { get; set; }
         public DbSet<Egg> Eggs { get; set; }
+        public DbSet<Item> Items { get; set; }
         public DbSet<Listing> Listings { get; set; }
         public DbSet<PetOwner> PetOwners { get; set; }
         public DbSet<Image> Images { get; set; }
@@ -30,6 +31,8 @@ namespace TatsugotchiWebAPI.Data {
                 .ApplyConfiguration<Egg>(new EggMapper())
                 .ApplyConfiguration<PetOwner>(new PetOwnerMapper())
                 .ApplyConfiguration<Listing>(new ListingMapper())
+                .ApplyConfiguration<PetOwner_Item>(new PetOwnerItemMapper())
+                .ApplyConfiguration<Item>(new ItemMapper())
                 .ApplyConfiguration<AnimalEgg>(new AnimalEggMapper());
         }
 
