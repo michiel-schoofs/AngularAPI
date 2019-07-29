@@ -20,6 +20,8 @@ namespace TatsugotchiWebAPI.BackgroundWorkers {
                 _animalrepo.AddAnimal(al,true);
             }
 
+            _animalrepo.SaveChanges();
+
             System.Diagnostics.Debug.WriteLine("Preformed Egg operation");
         }
     }

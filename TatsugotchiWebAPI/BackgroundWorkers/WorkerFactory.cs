@@ -7,12 +7,17 @@ namespace TatsugotchiWebAPI.BackgroundWorkers {
         private readonly ServiceProvider _sp;
         private readonly IAnimalRepository _animalRepo;
         private readonly IEggRepository _eggRepo;
+        private readonly IItemRepository _itemRepo;
+        private readonly IMarketRepository _marketRepo;
 
         public WorkerFactory(ServiceProvider sp) {
             _sp = sp;
             _sp.CreateScope();
+
             _animalRepo = _sp.GetService<IAnimalRepository>();
             _eggRepo = _sp.GetService<IEggRepository>();
+            _itemRepo = _sp.GetService<IItemRepository>();
+            _marketRepo = _sp.GetService<IMarketRepository>();
         }
 
         public IWorker MakeWorker(string worker) {
@@ -26,8 +31,8 @@ namespace TatsugotchiWebAPI.BackgroundWorkers {
                 case "EggWorker":
                     res = new EggWorker(_eggRepo, _animalRepo);
                     break;
-                case "DeathWorker":
-                    res = new DeathWorker(_animalRepo);
+                case "MarketWorker":
+                    res = new MarketWorker(_itemRepo, _marketRepo);
                     break;
                 default:
                     throw new ArgumentException("Something went wrong with the scheduling");

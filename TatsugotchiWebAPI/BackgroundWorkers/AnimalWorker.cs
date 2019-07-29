@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
+using TatsugotchiWebAPI.Data;
 using TatsugotchiWebAPI.Model.Interfaces;
 
 namespace TatsugotchiWebAPI.BackgroundWorkers{
@@ -14,13 +15,15 @@ namespace TatsugotchiWebAPI.BackgroundWorkers{
         }
 
         public override void PreformDatabaseActions() {
-            var animals = _animalRepository.GetNotDeceasedAnimals();
+            using (ApplicationDBContext context = new ApplicationDBContext()) { 
+                var animals = _animalRepository.GetNotDeceasedAnimals(context);
 
-            foreach(var animal in animals) {
-                animal.IncreaseHungerAndBoredom();
+                foreach(var animal in animals) {
+                    animal.IncreaseHungerAndBoredom();
+                }
+
+                context.SaveChanges();
             }
-
-            _animalRepository.SaveChanges();
             System.Diagnostics.Debug.WriteLine("Preformed Animal operation");
         }
     }

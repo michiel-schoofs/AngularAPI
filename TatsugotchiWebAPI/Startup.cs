@@ -135,7 +135,7 @@ namespace TatsugotchiWebAPI {
 
             ////custom stuff added to pipeline
             di.Seed();
-            //MakeScheduler();
+            MakeScheduler();
         }
 
         public void MakeScheduler() {

@@ -24,6 +24,14 @@ namespace TatsugotchiWebAPI.Data.Repository
             return _items.FirstOrDefault(i => i.ID == id);
         }
 
+        //Called from multithreaded enviroment
+        public ICollection<Item> GetItems(){
+            using (ApplicationDBContext context = new ApplicationDBContext()) {
+                context.Items.Load();
+                return context.Items.ToList();
+            }
+        }
+
         public void RemoveItem(Item item) {
             _items.Remove(item);
         }

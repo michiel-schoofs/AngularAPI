@@ -52,11 +52,13 @@ namespace TatsugotchiWebAPI.Data.Repository {
                 return _animals.FirstOrDefault(a => a.ID == id);
             }
 
-            public ICollection<Animal> GetNotDeceasedAnimals() {
-                return GetAllAnimals().Where(a => !(a.IsDeceased||a.RanAway)).ToList();
-            }
+        public ICollection<Animal> GetNotDeceasedAnimals(ApplicationDBContext context)
+        {
+            context.Animals.Load();
+            return context.Animals.Where(a => !a.IsDeceased && !a.RanAway).ToList();
+        }
 
-            public void RemoveAnimal(Animal animal) {
+        public void RemoveAnimal(Animal animal) {
                 _animals.Remove(animal);
                 SaveChanges();
             }

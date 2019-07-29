@@ -22,5 +22,10 @@ namespace TatsugotchiWebAPI.Data.Repository
             return markets.Include(m => m.Listings)
                     .ThenInclude(ml => ml.Item).First();
         }
+
+        public Market GetMarketMultiEnv(ApplicationDBContext context){
+                context.Market.Include(ml => ml.Listings).Load();
+                return context.Market.Include(ml=>ml.Listings).First();
+        }
     }
 }
