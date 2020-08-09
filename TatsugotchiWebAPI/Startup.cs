@@ -92,7 +92,6 @@ namespace TatsugotchiWebAPI {
 
             services.AddCors(options => options.AddPolicy("AllowAllOrigins", builder => builder.AllowAnyOrigin()));
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             Services = services.BuildServiceProvider();
@@ -107,7 +106,7 @@ namespace TatsugotchiWebAPI {
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(Configuration["Tokens:Key"])),
+                        Encoding.UTF8.GetBytes("dsjfksldeo")),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     RequireExpirationTime = true //Ensure token hasn't expired

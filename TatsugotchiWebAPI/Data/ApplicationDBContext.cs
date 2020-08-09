@@ -19,7 +19,7 @@ namespace TatsugotchiWebAPI.Data {
         public DbSet<Market> Market { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder.UseSqlServer("Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;");
+            optionsBuilder.UseSqlServer("Server=tcp:tatsugotchi.database.windows.net,1433;Initial Catalog=Tatsugotchi;Persist Security Info=False;User ID=Sandra;Password=HQbBt52hbzj2L0;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=3000;");
             base.OnConfiguring(optionsBuilder);
         }
 
