@@ -32,15 +32,15 @@ namespace TatsugotchiWebAPI.Data.Repository {
         } 
 
         public void Seed() {
-            //_context.Database.EnsureDeleted();
+            _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            /*AddUsers();
+            AddUsers();
             AddBadges();
             AddAnimals();
             AddSpecialCases();
             SetUpBreedingBug();
             AddItems();
-            SeedMarket();*/
+            SeedMarket();
         }
 
         private void SeedMarket(){
