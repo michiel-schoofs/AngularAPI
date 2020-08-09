@@ -106,7 +106,7 @@ namespace TatsugotchiWebAPI {
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes("dsjfksldeo")),
+                        Encoding.UTF8.GetBytes("dsjfksldezeteiurhroijeo123489321564sqdfeijziofjzoe")),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     RequireExpirationTime = true //Ensure token hasn't expired

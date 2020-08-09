@@ -123,7 +123,7 @@ namespace TatsugotchiWebAPI.Controllers
                   new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName)
                 };
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("dsjfksldeo"));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("dsjfksldezeteiurhroijeo123489321564sqdfeijziofjzoe"));
 
                 var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
