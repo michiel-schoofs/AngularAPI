@@ -37,11 +37,14 @@ namespace TatsugotchiWebAPI.Data.Repository {
             AddUsers();
             AddBadges();
             AddAnimals();
+            AddListings();
             AddSpecialCases();
             SetUpBreedingBug();
             AddItems();
             SeedMarket();
         }
+
+
 
         private void SeedMarket(){
             var market = Market.GetMarket();
@@ -80,6 +83,19 @@ namespace TatsugotchiWebAPI.Data.Repository {
             _context.PetOwners.Add(po);
             _um.CreateAsync(new IdentityUser() { UserName = dto.Email, Email = dto.Email },dto.Password).Wait();
             _petOwners.Add(po);
+
+            dto = new RegisterDTO() {
+                Email = "listingAccout@test.be",
+                BirthDay = DateTime.Now.AddYears(-25),
+                Password = "string12345",
+                Username = "lister"
+            };
+
+            po = new PetOwner(dto);
+            _context.PetOwners.Add(po);
+            _um.CreateAsync(new IdentityUser() { UserName = dto.Email, Email = dto.Email }, dto.Password).Wait();
+            _petOwners.Add(po);
+
 
             _context.SaveChanges();
         }
@@ -168,13 +184,58 @@ namespace TatsugotchiWebAPI.Data.Repository {
                 ,web4User),
                 new Animal("Charlotte",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-33),
                 initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
-                ,testUser)
+                ,testUser)               
             };
 
             _context.Animals.AddRange(animals);
             _context.SaveChanges();
 
             Breed(animals);
+        }
+
+        private void AddListings() {
+            var lister = _petOwners.FirstOrDefault(po => po.Username.Equals("lister"));
+            var initBadges = _context.Badges.ToList();
+
+            Animal[] animals = {
+                 new Animal("Deborah",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-15),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Neve",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-8),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Nina",AnimalType.Capybara,AnimalGender.Female,DateTime.Now.AddDays(-12),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("George",AnimalType.Capybara,AnimalGender.Male,DateTime.Now.AddDays(-2),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Svitlana",AnimalType.Tapir,AnimalGender.Female,DateTime.Now.AddDays(-10),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Louise",AnimalType.Tapir,AnimalGender.Male,DateTime.Now.AddDays(-7),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Bert",AnimalType.Tapir,AnimalGender.Male,DateTime.Now.AddDays(-16),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Sara",AnimalType.Alpaca,AnimalGender.Female,DateTime.Now.AddDays(-4),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister),
+                new Animal("Daniel",AnimalType.Alpaca,AnimalGender.Male,DateTime.Now.AddDays(-9),
+                initBadges,false,false,false,GetRandomNumber(),GetRandomNumber(),GetRandomNumber(),GetRandomNumber()
+                ,lister)
+            };
+
+            _context.Animals.AddRange(animals);
+            _context.SaveChanges();
+
+            foreach (var animal in animals) {
+                Listing listing = new Listing(animal, true, false);
+                _context.Listings.Add(listing);
+            }
+
+            _context.SaveChanges();
         }
 
         private int GetRandomNumber(){

@@ -43,9 +43,9 @@ namespace TatsugotchiWebAPI.Controllers
             /// </summary>
             /// <returns>Return the data transfer object of those listings</returns>
             [HttpGet]
-            public ActionResult<List<ListingDTO>> GetListingByOtherUsers() {
+            public ActionResult<List<DisplayListingDTO>> GetListingByOtherUsers() {
                 var listing = _listingRepo.GetListingsNotByUser(GetOwner());
-                return listing.Select(l => new ListingDTO(l)).ToList();
+                return listing.Select(l => new DisplayListingDTO(l)).ToList();
             }
 
             /// <summary>

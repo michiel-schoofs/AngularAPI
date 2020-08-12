@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TatsugotchiWebAPI.Model;
+using TatsugotchiWebAPI.Model.EFClasses;
 using TatsugotchiWebAPI.Model.Interfaces;
 
 namespace TatsugotchiWebAPI.Data.Repository
@@ -36,12 +37,15 @@ namespace TatsugotchiWebAPI.Data.Repository
         }
 
         public IEnumerable<Listing> GetListingsNotByUser(PetOwner po){
+            var all_listings = _listings.Include(l => l.Animal).ThenInclude(a => a.AnimalBadges).ThenInclude(ab => ab.Badge)
+                .Include(l => l.Animal).ThenInclude(a => a.Owner).ToList();
+
             var listings = _listings.Include(l=>l.Animal).ThenInclude(a=>a.Owner)
                 .Where(l => l.Animal.Owner == po).ToList();
 
             var invalid = _listings.Include(l=>l.Animal).Where(l => (l.Animal.IsDeceased || l.Animal.RanAway));
 
-            return _listings.Include(l=>l.Animal).ThenInclude(a => a.Owner).Except(listings)
+            return all_listings.Except(listings)
                 .Except(invalid).ToList();
         }
 

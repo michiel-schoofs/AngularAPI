@@ -19,7 +19,9 @@ namespace TatsugotchiWebAPI.Data {
         public DbSet<Market> Market { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder.UseSqlServer("Server=172.12.0.2,1433; User Id=sa;Password=p@ssw0rd;Database=Tatsugotchi");
+            //Docker "Server=172.12.0.2,1433; User Id=sa;Password=p@ssw0rd;Database=Tatsugotchi"
+            //Local "Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;"
+            optionsBuilder.UseSqlServer("Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;");
             base.OnConfiguring(optionsBuilder);
         }
 
