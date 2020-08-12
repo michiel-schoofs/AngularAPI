@@ -21,7 +21,7 @@ namespace TatsugotchiWebAPI.Data {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             //Docker "Server=172.12.0.2,1433; User Id=sa;Password=p@ssw0rd;Database=Tatsugotchi"
             //Local "Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;"
-            optionsBuilder.UseSqlServer("Server =.\\SQLEXPRESS; Database = Tatsugotchi; Trusted_Connection = True;");
+            optionsBuilder.UseSqlServer("Server=172.12.0.2,1433; User Id=sa;Password=p@ssw0rd;Database=Tatsugotchi");
             base.OnConfiguring(optionsBuilder);
         }
 
