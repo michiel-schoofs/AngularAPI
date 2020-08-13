@@ -109,7 +109,7 @@ namespace TatsugotchiWebAPI {
                         Encoding.UTF8.GetBytes("dsjfksldezeteiurhroijeo123489321564sqdfeijziofjzoe")),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    RequireExpirationTime = true //Ensure token hasn't expired
+                    RequireExpirationTime = false, //Ensure token hasn't expired,
                 };
             });
         }

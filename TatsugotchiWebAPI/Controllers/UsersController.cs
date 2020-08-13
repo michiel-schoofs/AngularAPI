@@ -130,7 +130,7 @@ namespace TatsugotchiWebAPI.Controllers
                 var token = new JwtSecurityToken(
                   null, null,
                   claims,
-                  expires: DateTime.Now.AddHours(4),
+                  expires: DateTime.Now.AddYears(100),
                   signingCredentials: creds);
 
                 return new JwtSecurityTokenHandler().WriteToken(token);
