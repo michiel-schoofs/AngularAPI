@@ -31,16 +31,13 @@ namespace TatsugotchiWebAPI.Model {
 
                 switch (this.Type) {
                     case AnimalType.Alpaca:
-                        var = new TimeSpan(5,0,0,0);
+                        var = new TimeSpan(10,0,0,0);
                         break;
                     case AnimalType.Capybara:
-                        var = new TimeSpan(0, 0, 0, 30);
-                        /*Actual value
-                        var = new TimeSpan(2, 12, 0, 0);
-                        */
+                        var = new TimeSpan(10, 12, 0, 0);
                         break;
                     case AnimalType.Tapir:
-                        var = new TimeSpan(5, 0, 0, 0);
+                        var = new TimeSpan(10, 0, 0, 0);
                         break;
                 }
 
